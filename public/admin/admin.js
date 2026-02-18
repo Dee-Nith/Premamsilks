@@ -369,7 +369,7 @@ const AdminApp = (function () {
 
     function handleFileSelect(files) {
         if (!files || files.length === 0) return;
-        const maxSize = 50 * 1024 * 1024; // 50MB
+        const maxSize = 10 * 1024 * 1024; // 10MB (Cloudinary unsigned preset limit)
 
         for (const file of files) {
             if (!file.type.startsWith('image/')) {
@@ -377,7 +377,7 @@ const AdminApp = (function () {
                 continue;
             }
             if (file.size > maxSize) {
-                showNotification(`${file.name} exceeds 50MB limit.`, 'error');
+                showNotification(`${file.name} exceeds 10MB. Please compress or resize the image before uploading.`, 'error');
                 continue;
             }
             pendingImageFiles.push(file);
@@ -592,6 +592,19 @@ const AdminApp = (function () {
             if (pendingImageFiles.length > 0) {
                 saveBtn.textContent = 'Uploading images...';
                 newImageUrls = await uploadImages(sareeCode);
+            }
+
+            // Gate: If images were pending but all failed, abort the save
+            if (pendingImageFiles.length > 0 && newImageUrls.length === 0) {
+                showNotification('Image upload failed. Please try a smaller image (under 10MB) and save again.', 'error');
+                saveBtn.textContent = origText;
+                saveBtn.disabled = false;
+                return;
+            }
+
+            // Warn if only some images failed
+            if (pendingImageFiles.length > 0 && newImageUrls.length < pendingImageFiles.length) {
+                showNotification(`${pendingImageFiles.length - newImageUrls.length} image(s) failed to upload. Product saved with ${newImageUrls.length} image(s).`, 'warning');
             }
 
             // Combine existing + newly uploaded images
