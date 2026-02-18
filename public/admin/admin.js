@@ -367,20 +367,61 @@ const AdminApp = (function () {
         });
     }
 
-    function handleFileSelect(files) {
+    async function compressImage(file, quality = 0.85, maxDim = 2400) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxDim || height > maxDim) {
+                        const ratio = Math.min(maxDim / width, maxDim / height);
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        if (!blob || blob.size >= file.size) {
+                            resolve(file);
+                            return;
+                        }
+                        const originalMB = (file.size / 1024 / 1024).toFixed(1);
+                        const newMB = (blob.size / 1024 / 1024).toFixed(1);
+                        console.log(`Compressed ${file.name}: ${originalMB}MB → ${newMB}MB`);
+                        resolve(new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        }));
+                    }, 'image/jpeg', quality);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function handleFileSelect(files) {
         if (!files || files.length === 0) return;
-        const maxSize = 10 * 1024 * 1024; // 10MB (Cloudinary unsigned preset limit)
+        const maxSize = 10 * 1024 * 1024; // 10MB hard limit after compression
 
         for (const file of files) {
             if (!file.type.startsWith('image/')) {
                 showNotification(`${file.name} is not an image file.`, 'error');
                 continue;
             }
-            if (file.size > maxSize) {
-                showNotification(`${file.name} exceeds 10MB. Please compress or resize the image before uploading.`, 'error');
+
+            const compressed = await compressImage(file);
+
+            if (compressed.size > maxSize) {
+                showNotification(`${file.name} is too large even after compression. Please use a smaller image.`, 'error');
                 continue;
             }
-            pendingImageFiles.push(file);
+
+            pendingImageFiles.push(compressed);
         }
 
         renderImagePreviews();
