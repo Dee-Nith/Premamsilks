@@ -5,6 +5,13 @@
 (function () {
     'use strict';
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
+
     // -------------------------------------------------------
     // State
     // -------------------------------------------------------
@@ -99,8 +106,8 @@
                 </div>
             </div>
             <div class="product-info">
-                <span class="product-category">${p.category || 'Saree'}</span>
-                <h4 class="product-name">${p.name || 'Untitled'}</h4>
+                <span class="product-category">${escapeHTML(p.category || 'Saree')}</span>
+                <h4 class="product-name">${escapeHTML(p.name || 'Untitled')}</h4>
                 ${p.sareeCode ? `<small style="color:#8a7e6b;font-size:0.7rem;">${p.sareeCode}</small>` : ''}
                 <div class="product-price">
                     <span class="current">${formatPrice(p.price || 0)}</span>
@@ -317,17 +324,13 @@
                 ...doc.data()
             }));
 
-            console.log(`🛍️ Loaded ${allProducts.length} products from Firestore`);
         } catch (err) {
-            console.warn('Could not load products from Firestore, trying without filter:', err.message);
-
             try {
                 const db = firebase.firestore();
                 const snapshot = await db.collection('products').get();
                 allProducts = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
                     .filter(p => p.isActive !== false);
-                console.log(`🛍️ Loaded ${allProducts.length} products (fallback)`);
             } catch (err2) {
                 console.error('Failed to load products:', err2);
                 allProducts = [];

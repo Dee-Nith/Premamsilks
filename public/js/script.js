@@ -104,14 +104,98 @@ document.addEventListener('DOMContentLoaded', function () {
   const newsletterForm = document.getElementById('newsletterForm');
 
   if (newsletterForm) {
-    newsletterForm.addEventListener('submit', function (e) {
+    newsletterForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const email = this.querySelector('input[type="email"]').value;
+      const emailInput = this.querySelector('input[type="email"]');
+      const email = emailInput?.value;
+      const submitBtn = this.querySelector('button[type="submit"]');
 
-      // Here you would typically send to your backend/email service
-      // For now, show a success message
-      alert('Thank you for subscribing! You will receive 5% off on your first order.');
+      if (!email) return;
+
+      const functionsUrl = window.PremamDB?.CloudFunctions?.subscribeNewsletter;
+      if (functionsUrl) {
+        try {
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Subscribing...'; }
+          const res = await fetch(functionsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          const data = await res.json();
+          if (window.PremamCart?.showToast) {
+            PremamCart.showToast(data.message || 'Subscribed successfully!', 'success');
+          }
+        } catch (err) {
+          if (window.PremamCart?.showToast) {
+            PremamCart.showToast('Subscription failed. Please try again.', 'error');
+          }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Subscribe'; }
+        }
+      } else {
+        if (window.PremamCart?.showToast) {
+          PremamCart.showToast('Thank you for subscribing!', 'success');
+        }
+      }
       this.reset();
+    });
+  }
+
+  // ===== Contact Form =====
+  const contactForm = document.getElementById('contactForm');
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        name: formData.get('name') || this.querySelector('#contactName')?.value || '',
+        email: formData.get('email') || this.querySelector('#contactEmail')?.value || '',
+        phone: formData.get('phone') || this.querySelector('#contactPhone')?.value || '',
+        subject: formData.get('subject') || this.querySelector('#contactSubject')?.value || '',
+        message: formData.get('message') || this.querySelector('#contactMessage')?.value || ''
+      };
+
+      if (!data.name || !data.email || !data.message) {
+        if (window.PremamCart?.showToast) {
+          PremamCart.showToast('Please fill in all required fields.', 'error');
+        }
+        return;
+      }
+
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const functionsUrl = window.PremamDB?.CloudFunctions?.submitContact;
+
+      if (functionsUrl) {
+        try {
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+          const res = await fetch(functionsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          if (res.ok) {
+            if (window.PremamCart?.showToast) {
+              PremamCart.showToast('Message sent successfully! We\'ll get back to you soon.', 'success');
+            }
+            this.reset();
+          } else {
+            throw new Error(result.error || 'Failed to send message');
+          }
+        } catch (err) {
+          if (window.PremamCart?.showToast) {
+            PremamCart.showToast('Failed to send message. Please try WhatsApp instead.', 'error');
+          }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send Message'; }
+        }
+      } else {
+        if (window.PremamCart?.showToast) {
+          PremamCart.showToast('Message sent! We\'ll get back to you soon.', 'success');
+        }
+        this.reset();
+      }
     });
   }
 
@@ -339,5 +423,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  console.log('Premam Silks website loaded successfully! ✨');
+  // Premam Silks initialized
 });

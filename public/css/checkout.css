@@ -484,9 +484,10 @@ a.progress-step:hover .step-text {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .checkout-grid {
         grid-template-columns: 1fr;
+        gap: 24px;
     }
 
     .order-summary-card {
@@ -494,7 +495,7 @@ a.progress-step:hover .step-text {
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
     .checkout-form {
         padding: 20px;
     }

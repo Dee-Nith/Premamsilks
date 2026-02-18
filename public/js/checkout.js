@@ -1,15 +1,12 @@
 /**
  * PREMAM SILKS — Checkout & Razorpay Payment Module
- * 
- * Handles checkout form, address collection, order creation,
- * and Razorpay payment processing.
- * 
- * Flow:
+ *
+ * Secure payment flow using Cloud Functions:
  * 1. User fills shipping details
- * 2. Click "Pay Now" → create order in Firestore
+ * 2. Click "Pay Now" → Cloud Function creates Razorpay order (verified amount)
  * 3. Open Razorpay modal → user pays
- * 4. On success → update order with payment ID → redirect to confirmation
- * 5. On failure → show error, allow retry
+ * 4. On success → Cloud Function verifies signature + updates order + decrements stock
+ * 5. Redirect to confirmation
  */
 
 const PremamCheckout = (function () {
@@ -22,7 +19,7 @@ const PremamCheckout = (function () {
     const validators = {
         name: (val) => val.trim().length >= 2 ? '' : 'Name must be at least 2 characters',
         email: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? '' : 'Enter a valid email address',
-        phone: (val) => /^[6-9]\d{9}$/.test(val.replace(/\s/g, '')) ? '' : 'Enter a valid 10-digit phone number',
+        phone: (val) => /^(\+91)?[6-9]\d{9}$/.test(val.replace(/[\s-]/g, '')) ? '' : 'Enter a valid 10-digit mobile number',
         address: (val) => val.trim().length >= 10 ? '' : 'Enter your full address',
         city: (val) => val.trim().length >= 2 ? '' : 'Enter your city',
         state: (val) => val.trim().length >= 2 ? '' : 'Select your state',
@@ -50,7 +47,6 @@ const PremamCheckout = (function () {
 
         input.classList.add('input-error');
 
-        // Remove existing error
         const existingError = input.parentElement.querySelector('.field-error');
         if (existingError) existingError.remove();
 
@@ -68,8 +64,14 @@ const PremamCheckout = (function () {
     }
 
     // ============================================================
-    // ORDER CREATION
+    // HELPERS
     // ============================================================
+
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
     function getFormData() {
         return {
@@ -84,49 +86,29 @@ const PremamCheckout = (function () {
         };
     }
 
-    function buildOrderData(formData) {
-        const cartItems = PremamCart.getItems();
-        const totals = PremamCart.getTotal();
-
-        return {
-            customer: {
-                name: formData.name.trim(),
-                email: formData.email.trim().toLowerCase(),
-                phone: formData.phone.replace(/\s/g, ''),
-            },
-            shippingAddress: {
-                address: formData.address.trim(),
-                city: formData.city.trim(),
-                state: formData.state.trim(),
-                pincode: formData.pincode.trim(),
-                country: 'India'
-            },
-            items: cartItems.map(item => ({
-                productId: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                image: item.image
-            })),
-            itemCount: PremamCart.getCount(),
-            subtotal: totals.subtotal,
-            shipping: totals.shipping,
-            gst: totals.gst,
-            totalAmount: totals.total,
-            notes: formData.notes.trim(),
-            paymentMethod: 'razorpay',
-            status: 'pending'
-        };
+    function setPayBtnState(loading, text) {
+        const payBtn = document.getElementById('payBtn');
+        if (!payBtn) return;
+        payBtn.disabled = loading;
+        payBtn.style.pointerEvents = loading ? 'none' : '';
+        payBtn.innerHTML = loading
+            ? '<span class="spinner"></span> ' + escapeHTML(text || 'Processing...')
+            : '🔒 Pay Now';
     }
 
     // ============================================================
-    // RAZORPAY PAYMENT
+    // PAYMENT FLOW (Cloud Functions)
     // ============================================================
 
+    let isProcessing = false;
+
     async function processPayment() {
+        if (isProcessing) return;
+        isProcessing = true;
+
         const formData = getFormData();
 
-        // Validate
+        // Validate form
         clearFieldErrors();
         const { isValid, errors } = validateForm(formData);
 
@@ -135,89 +117,99 @@ const PremamCheckout = (function () {
                 showFieldError(field, message);
             });
             PremamCart.showToast('Please fix the errors above', 'error');
+            isProcessing = false;
             return;
         }
 
         // Check cart
         if (PremamCart.getCount() === 0) {
             PremamCart.showToast('Your cart is empty!', 'error');
+            isProcessing = false;
             return;
         }
 
-        const orderData = buildOrderData(formData);
-        const payBtn = document.getElementById('payBtn');
+        setPayBtnState(true, 'Creating order...');
 
         try {
-            // Disable button
-            if (payBtn) {
-                payBtn.disabled = true;
-                payBtn.innerHTML = '<span class="spinner"></span> Processing...';
+            const cartItems = PremamCart.getItems();
+            const functionsUrl = window.PremamDB?.CloudFunctions;
+
+            if (!functionsUrl?.createOrder) {
+                throw new Error('Payment service unavailable. Please try again later.');
             }
 
-            // Create order in Firestore (if available)
-            let orderId = 'ORD-' + Date.now();
+            // Step 1: Create order via Cloud Function (server-verified amount)
+            const createResponse = await fetch(functionsUrl.createOrder, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items: cartItems.map(item => ({
+                        productId: item.id,
+                        quantity: item.quantity
+                    })),
+                    customer: {
+                        name: formData.name.trim(),
+                        email: formData.email.trim().toLowerCase(),
+                        phone: formData.phone.replace(/[\s-]/g, '')
+                    },
+                    shippingAddress: {
+                        address: formData.address.trim(),
+                        city: formData.city.trim(),
+                        state: formData.state.trim(),
+                        pincode: formData.pincode.trim()
+                    },
+                    notes: formData.notes.trim()
+                })
+            });
 
-            if (window.PremamDB && typeof window.PremamDB.createOrder === 'function') {
-                try {
-                    orderId = await window.PremamDB.createOrder(orderData);
-                } catch (dbError) {
-                    console.warn('Firestore order creation failed, using local ID:', dbError);
-                }
+            const orderResult = await createResponse.json();
+
+            if (!createResponse.ok) {
+                throw new Error(orderResult.error || 'Failed to create order');
             }
 
-            // Open Razorpay checkout
-            openRazorpay(orderId, orderData);
+            // Step 2: Open Razorpay with server-created order
+            setPayBtnState(true, 'Opening payment...');
+            openRazorpay(orderResult, formData);
 
         } catch (error) {
             console.error('Payment error:', error);
-            PremamCart.showToast('Something went wrong. Please try again.', 'error');
-
-            if (payBtn) {
-                payBtn.disabled = false;
-                payBtn.innerHTML = '🔒 Pay Now';
-            }
+            PremamCart.showToast(error.message || 'Something went wrong. Please try again.', 'error');
+            setPayBtnState(false);
+            isProcessing = false;
         }
     }
 
-    function openRazorpay(orderId, orderData) {
+    function openRazorpay(orderResult, formData) {
         const config = window.PremamDB?.RAZORPAY_CONFIG || {
             keyId: 'YOUR_RAZORPAY_KEY_ID',
             businessName: 'Premam Silks',
-            theme: { color: '#8B1A2B' }
+            theme: { color: '#0d6157' }
         };
 
         const options = {
             key: config.keyId,
-            amount: orderData.totalAmount * 100, // Razorpay expects amount in paise
-            currency: 'INR',
+            amount: orderResult.amount * 100,
+            currency: orderResult.currency,
             name: config.businessName,
-            description: `Order #${orderId} — ${orderData.itemCount} item(s)`,
+            description: `Order #${orderResult.orderId}`,
             image: config.businessLogo || '',
-            order_id: '', // Will be set when using Firebase Functions for order creation
+            order_id: orderResult.razorpayOrderId,
             prefill: {
-                name: orderData.customer.name,
-                email: orderData.customer.email,
-                contact: orderData.customer.phone
-            },
-            notes: {
-                orderId: orderId,
-                address: `${orderData.shippingAddress.address}, ${orderData.shippingAddress.city}`
+                name: formData.name,
+                email: formData.email,
+                contact: formData.phone
             },
             theme: {
-                color: config.theme.color
+                color: config.theme?.color || '#0d6157'
             },
             handler: async function (response) {
-                // Payment successful
-                await handlePaymentSuccess(orderId, response, orderData);
+                await handlePaymentSuccess(orderResult.orderId, response);
             },
             modal: {
                 ondismiss: function () {
-                    // Payment cancelled
-                    const payBtn = document.getElementById('payBtn');
-                    if (payBtn) {
-                        payBtn.disabled = false;
-                        payBtn.innerHTML = '🔒 Pay Now';
-                    }
+                    setPayBtnState(false);
+                    isProcessing = false;
                     PremamCart.showToast('Payment cancelled', 'info');
                 }
             }
@@ -230,71 +222,57 @@ const PremamCheckout = (function () {
         rzp.open();
     }
 
-    async function handlePaymentSuccess(orderId, razorpayResponse, orderData) {
+    async function handlePaymentSuccess(orderId, razorpayResponse) {
+        setPayBtnState(true, 'Verifying payment...');
+
         try {
-            // Update order in Firestore with payment details
-            if (window.PremamDB && typeof window.PremamDB.updateOrderPayment === 'function') {
-                await window.PremamDB.updateOrderPayment(orderId, {
+            const functionsUrl = window.PremamDB?.CloudFunctions;
+
+            // Step 3: Verify payment signature server-side
+            const verifyResponse = await fetch(functionsUrl.verifyPayment, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId,
+                    razorpayOrderId: razorpayResponse.razorpay_order_id,
                     razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-                    razorpayOrderId: razorpayResponse.razorpay_order_id || '',
-                    razorpaySignature: razorpayResponse.razorpay_signature || ''
-                });
+                    razorpaySignature: razorpayResponse.razorpay_signature
+                })
+            });
+
+            const verifyResult = await verifyResponse.json();
+
+            if (!verifyResponse.ok) {
+                throw new Error(verifyResult.error || 'Payment verification failed');
             }
 
-            // Save order to localStorage for confirmation page
-            const completedOrder = {
-                orderId,
-                ...orderData,
-                razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-                paidAt: new Date().toISOString(),
-                status: 'paid'
-            };
-
-            localStorage.setItem('premam_last_order', JSON.stringify(completedOrder));
+            // Store only order ID (not sensitive data)
+            localStorage.setItem('premam_last_order', JSON.stringify({ orderId }));
 
             // Clear cart
             PremamCart.clear();
 
-            // Send WhatsApp notification (optional)
-            sendWhatsAppNotification(completedOrder);
-
-            // Redirect to confirmation page
+            // Redirect to confirmation
             window.location.href = `order-confirmation.html?id=${orderId}`;
 
         } catch (error) {
-            console.error('Post-payment processing error:', error);
-            // Payment was successful, so still redirect
+            console.error('Payment verification error:', error);
+            // Payment was likely successful — still redirect with a note
+            localStorage.setItem('premam_last_order', JSON.stringify({ orderId }));
+            PremamCart.clear();
             window.location.href = `order-confirmation.html?id=${orderId}`;
         }
     }
 
     function handlePaymentFailure(response) {
-        console.error('Payment failed:', response.error);
-        PremamCart.showToast('Payment failed: ' + response.error.description, 'error');
-
-        const payBtn = document.getElementById('payBtn');
-        if (payBtn) {
-            payBtn.disabled = false;
-            payBtn.innerHTML = '🔒 Pay Now';
-        }
-    }
-
-    /**
-     * Send WhatsApp notification to business about new order
-     */
-    function sendWhatsAppNotification(order) {
-        const config = window.PremamDB?.APP_CONFIG || { whatsappNumber: '917200123457' };
-        const itemsList = order.items.map(i => `${i.name} × ${i.quantity}`).join(', ');
-        const msg = `🎉 New Order #${order.orderId}!\n\nCustomer: ${order.customer.name}\nPhone: ${order.customer.phone}\nItems: ${itemsList}\nTotal: ₹${order.totalAmount.toLocaleString('en-IN')}\nPayment: ${order.razorpayPaymentId}`;
-
-        // Open WhatsApp in new tab (silent notification)
-        const url = `https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(msg)}`;
-        // Don't auto-open — this can be triggered from admin
-        console.log('WhatsApp notification ready:', url);
+        console.error('Payment failed:', response.error?.code);
+        PremamCart.showToast('Payment failed. Please try again or use a different payment method.', 'error');
+        setPayBtnState(false);
+        isProcessing = false;
     }
 
     // ============================================================
-    // CHECKOUT PAGE RENDERER
+    // ORDER SUMMARY RENDERER
     // ============================================================
 
     function renderOrderSummary() {
@@ -319,18 +297,18 @@ const PremamCheckout = (function () {
         ${items.map(item => `
           <div class="order-item">
             <div class="order-item-img">
-              <img src="${item.image}" alt="${item.name}">
+              <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}">
               <span class="order-item-qty-badge">${item.quantity}</span>
             </div>
             <div class="order-item-info">
-              <span class="order-item-category">${item.category}</span>
-              <h4>${item.name}</h4>
+              <span class="order-item-category">${escapeHTML(item.category || '')}</span>
+              <h4>${escapeHTML(item.name)}</h4>
             </div>
             <div class="order-item-price">${PremamCart.formatPrice(item.price * item.quantity)}</div>
           </div>
         `).join('')}
       </div>
-      
+
       <div class="order-totals">
         <div class="order-total-row">
           <span>Subtotal (${PremamCart.getCount()} items)</span>
@@ -372,10 +350,8 @@ const PremamCheckout = (function () {
     // ============================================================
 
     function init() {
-        // Render order summary
         renderOrderSummary();
 
-        // Bind pay button
         const payBtn = document.getElementById('payBtn');
         if (payBtn) {
             payBtn.addEventListener('click', (e) => {
@@ -401,7 +377,6 @@ const PremamCheckout = (function () {
         });
     }
 
-    // Auto-init
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

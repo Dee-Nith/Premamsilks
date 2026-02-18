@@ -85,21 +85,9 @@ const AdminApp = (function () {
     }
 
     function handleOfflineLogin() {
-        // Demo/offline mode — bypass authentication
-        currentUser = {
-            displayName: 'Admin',
-            email: 'premamsilks@gmail.com',
-            uid: 'demo-user'
-        };
-
-        const nameEl = document.getElementById('adminName');
-        const emailEl = document.getElementById('adminEmail');
-        if (nameEl) nameEl.textContent = 'Admin (Demo)';
-        if (emailEl) emailEl.textContent = 'Demo Mode';
-
-        showAdmin();
-        loadDashboardData();
-        showNotification('Running in demo mode (Firebase not configured)', 'info');
+        // Demo mode disabled in production — show error instead
+        showLogin();
+        showNotification('Firebase connection required. Please check your internet connection and try again.', 'error');
     }
 
     function showLogin() {

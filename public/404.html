@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The page you're looking for doesn't exist.">
+  <title>Page Not Found | Premam Silks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <style>
+    .error-page {
+      padding: 120px 20px 60px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .error-page .error-code {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 8rem;
+      font-weight: 600;
+      color: var(--color-text-primary, #1a1a2e);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .error-page .error-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--color-text-primary, #1a1a2e);
+      margin-bottom: 1rem;
+    }
+    .error-page .error-message {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--color-text-secondary, #6b5e4f);
+      margin-bottom: 2.5rem;
+    }
+    .error-page .error-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .error-page .error-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    .error-page .error-btn-primary {
+      background-color: #1a1a2e;
+      color: #fff;
+    }
+    .error-page .error-btn-primary:hover {
+      background-color: #0d6157;
+    }
+    .error-page .error-btn-secondary {
+      background-color: transparent;
+      color: #1a1a2e;
+      border: 2px solid #1a1a2e;
+    }
+    .error-page .error-btn-secondary:hover {
+      background-color: #1a1a2e;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <p>✨ Free Shipping on Orders Above ₹25,000 | <a href="shop.html">Shop Now</a></p>
+  </div>
+  <header class="header" id="header">
+    <nav class="nav-container">
+      <a href="index.html" class="logo">
+        <div class="logo-text">
+          <span class="logo-name">PREMAM SILKS</span>
+          <span class="logo-tagline">Timeless Sarees • Endless Love</span>
+        </div>
+      </a>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="shop.html" class="nav-link">Sarees</a></li>
+        <li><a href="about.html" class="nav-link">About Us</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-icons">
+        <button class="nav-icon" id="searchBtn" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </button>
+        <a href="#wishlist" class="nav-icon" aria-label="Wishlist">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="badge">0</span>
+        </a>
+        <a href="#cart" class="nav-icon cart-icon" aria-label="Shopping Cart">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span class="badge cart-badge">0</span>
+        </a>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="error-page">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-message">The page you're looking for doesn't seem to exist. It may have been moved, deleted, or perhaps the URL was mistyped.</p>
+    <div class="error-buttons">
+      <a href="index.html" class="error-btn error-btn-primary">Back to Home</a>
+      <a href="shop.html" class="error-btn error-btn-secondary">Browse Sarees</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-column">
+          <h3 class="footer-brand">PREMAM SILKS</h3>
+          <p>Premam Silks brings you the finest handwoven silk sarees, where every thread is woven with love and every design tells a story of timeless elegance.</p>
+        </div>
+        <div class="footer-column">
+          <h4>Shop</h4>
+          <ul class="footer-links">
+            <li><a href="shop.html">All Sarees</a></li>
+            <li><a href="shop.html?category=kanjivaram">Kanjivaram</a></li>
+            <li><a href="shop.html?category=banarasi">Banarasi</a></li>
+            <li><a href="shop.html?category=bridal">Bridal Collection</a></li>
+            <li><a href="shop.html?filter=new">New Arrivals</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Help</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="shipping.html">Shipping Info</a></li>
+            <li><a href="returns.html">Returns & Exchange</a></li>
+            <li><a href="size-guide.html">Size Guide</a></li>
+            <li><a href="care-guide.html">Care Instructions</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li><a href="tel:+917200123457">+91 7200123457</a></li>
+            <li><a href="mailto:premamsilks@gmail.com">premamsilks@gmail.com</a></li>
+            <li>Chennai, Tamil Nadu</li>
+            <li>India</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Premam Silks. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

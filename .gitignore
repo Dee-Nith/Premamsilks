@@ -38,3 +38,4 @@ firebase-export-*/
 *.csv
 rzp-key.csv
 service-account.json
+functions/.env

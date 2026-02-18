@@ -17,6 +17,13 @@ const PremamCart = (function () {
 
     const STORAGE_KEY = 'premam_cart';
     const CART_EXPIRY_DAYS = 7;
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
     let cartItems = [];
     let listeners = [];
 
@@ -313,13 +320,13 @@ const PremamCart = (function () {
         }
 
         const itemsHTML = items.map(item => `
-      <div class="cart-item" data-id="${item.id}">
+      <div class="cart-item" data-id="${escapeHTML(item.id)}">
         <div class="cart-item-image">
-          <img src="${item.image}" alt="${item.name}" loading="lazy">
+          <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy">
         </div>
         <div class="cart-item-details">
-          <span class="cart-item-category">${item.category}</span>
-          <h4 class="cart-item-name">${item.name}</h4>
+          <span class="cart-item-category">${escapeHTML(item.category)}</span>
+          <h4 class="cart-item-name">${escapeHTML(item.name)}</h4>
           <div class="cart-item-price">${formatPrice(item.price)}</div>
           <div class="cart-item-qty">
             <button class="qty-btn minus" data-id="${item.id}" aria-label="Decrease quantity">−</button>

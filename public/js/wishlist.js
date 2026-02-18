@@ -14,6 +14,13 @@ const PremamWishlist = (function () {
     'use strict';
 
     const STORAGE_KEY = 'premam_wishlist';
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
     let wishlistItems = [];
 
     // ============================================================
@@ -141,13 +148,13 @@ const PremamWishlist = (function () {
         const itemsHTML = items.map(item => {
             const formatPrice = (n) => '₹' + Number(n).toLocaleString('en-IN');
             return `
-            <div class="cart-item wishlist-item" data-id="${item.id}">
+            <div class="cart-item wishlist-item" data-id="${escapeHTML(item.id)}">
                 <div class="cart-item-image">
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.png'">
+                    <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" onerror="this.src='images/placeholder.png'">
                 </div>
                 <div class="cart-item-details">
-                    <span class="cart-item-category">${item.category}</span>
-                    <p class="cart-item-name">${item.name}</p>
+                    <span class="cart-item-category">${escapeHTML(item.category)}</span>
+                    <p class="cart-item-name">${escapeHTML(item.name)}</p>
                     <span class="cart-item-price">${formatPrice(item.price)}</span>
                     <button class="wishlist-move-to-cart" data-id="${item.id}" style="margin-top:6px;padding:6px 14px;font-size:0.75rem;font-weight:600;background:#0d6157;color:#fff;border:none;border-radius:5px;cursor:pointer;transition:background 0.2s;">
                         🛒 Move to Cart

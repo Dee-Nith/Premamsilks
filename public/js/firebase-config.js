@@ -88,10 +88,9 @@ function initializeFirebase() {
                 }
             });
 
-        console.log('✅ Firebase initialized successfully');
         return true;
     } catch (error) {
-        console.error('❌ Firebase initialization error:', error);
+        console.error('Firebase initialization error:', error);
         return false;
     }
 }
@@ -251,6 +250,18 @@ async function updateOrderPayment(orderId, paymentData) {
 // Initialize on load
 document.addEventListener('DOMContentLoaded', initializeFirebase);
 
+// ============================================================
+// CLOUD FUNCTIONS CONFIG
+// ============================================================
+const FUNCTIONS_BASE_URL = `https://asia-south1-${FIREBASE_CONFIG.projectId}.cloudfunctions.net`;
+
+const CloudFunctions = {
+    createOrder: `${FUNCTIONS_BASE_URL}/createOrder`,
+    verifyPayment: `${FUNCTIONS_BASE_URL}/verifyPayment`,
+    submitContact: `${FUNCTIONS_BASE_URL}/submitContact`,
+    subscribeNewsletter: `${FUNCTIONS_BASE_URL}/subscribeNewsletter`
+};
+
 // Export for use across modules
 window.PremamDB = {
     getProducts,
@@ -262,6 +273,7 @@ window.PremamDB = {
     isAdminEmail,
     onAuthStateChange,
     Collections,
+    CloudFunctions,
     FIREBASE_CONFIG,
     RAZORPAY_CONFIG,
     ADMIN_CONFIG,
