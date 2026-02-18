@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Premam Silks</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <!-- ============================================================ -->
+    <!-- LOGIN SCREEN -->
+    <!-- ============================================================ -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <span>PREMAM SILKS</span>
+                <small>Admin Dashboard</small>
+            </div>
+            <p class="login-desc">Sign in with your authorized Google account to access the admin panel.</p>
+            <button class="login-btn" id="googleSignInBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+                    <path fill="#FFC107"
+                        d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                    <path fill="#FF3D00"
+                        d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                    <path fill="#4CAF50"
+                        d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                    <path fill="#1976D2"
+                        d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                </svg>
+                Sign in with Google
+            </button>
+            <p class="login-note">⚠️ Only authorized emails can access admin features.</p>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ADMIN LAYOUT -->
+    <!-- ============================================================ -->
+    <div class="admin-layout" id="adminLayout" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-brand">
+                <span class="brand-name">PREMAM</span>
+                <small>Admin Panel</small>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="sidebar-link active" data-tab="dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 13a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="sidebar-link" data-tab="products">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <span>Products</span>
+                </a>
+                <a href="#" class="sidebar-link" data-tab="orders">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="sidebar-link" data-tab="settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-user" id="adminUserInfo">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-user-details">
+                        <span class="admin-name" id="adminName">Admin</span>
+                        <span class="admin-email" id="adminEmail">admin@premamsilks.com</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Top Bar -->
+            <div class="admin-topbar">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <div class="topbar-right">
+                    <span class="topbar-date" id="currentDate"></span>
+                    <a href="index.html" target="_blank" class="topbar-link">View Store →</a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="admin-content" id="adminContent">
+
+                <!-- ===== DASHBOARD TAB ===== -->
+                <div class="tab-content active" id="tab-dashboard">
+                    <!-- Metric Cards -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon revenue">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total Revenue</span>
+                                <span class="metric-value" id="totalRevenue">₹0</span>
+                                <span class="metric-change positive">↑ 0% from last month</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon orders">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total Orders</span>
+                                <span class="metric-value" id="totalOrders">0</span>
+                                <span class="metric-change positive">↑ 0 this week</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon products">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Active Products</span>
+                                <span class="metric-value" id="totalProducts">0</span>
+                                <span class="metric-change neutral">In catalogue</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon customers">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Customers</span>
+                                <span class="metric-value" id="totalCustomers">0</span>
+                                <span class="metric-change positive">↑ 0 new</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="dashboard-grid">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <h3>Recent Orders</h3>
+                                <a href="#" class="card-action" data-goto="orders">View All</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Items</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentOrdersBody">
+                                        <tr class="empty-row">
+                                            <td colspan="6">
+                                                <div class="empty-state-small">No orders yet. Orders will appear here
+                                                    when customers make purchases.</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="admin-card quick-stats">
+                            <div class="card-header">
+                                <h3>Quick Stats</h3>
+                            </div>
+                            <div class="stat-items">
+                                <div class="stat-item">
+                                    <span class="stat-label">Avg Order Value</span>
+                                    <span class="stat-value" id="avgOrderValue">₹0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Pending Orders</span>
+                                    <span class="stat-value" id="pendingOrders">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Completed Orders</span>
+                                    <span class="stat-value" id="completedOrders">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Top Category</span>
+                                    <span class="stat-value" id="topCategory">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== PRODUCTS TAB ===== -->
+                <div class="tab-content" id="tab-products">
+                    <div class="tab-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" id="productSearch" placeholder="Search products...">
+                        </div>
+                        <button class="btn-admin primary" id="addProductBtn">+ Add Product</button>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="admin-card">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody">
+                                    <tr class="empty-row">
+                                        <td colspan="7">
+                                            <div class="empty-state-small">No products added yet. Click "Add Product" to
+                                                get started.</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ORDERS TAB ===== -->
+                <div class="tab-content" id="tab-orders">
+                    <div class="tab-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" id="orderSearch" placeholder="Search orders...">
+                            <select class="filter-select" id="orderStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Phone</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody">
+                                    <tr class="empty-row">
+                                        <td colspan="9">
+                                            <div class="empty-state-small">No orders to display.</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SETTINGS TAB ===== -->
+                <div class="tab-content" id="tab-settings">
+                    <div class="settings-grid">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <h3>Store Settings</h3>
+                            </div>
+                            <form class="settings-form" id="storeSettingsForm">
+                                <div class="settings-group">
+                                    <label>Store Name</label>
+                                    <input type="text" value="Premam Silks" id="settingStoreName">
+                                </div>
+                                <div class="settings-group">
+                                    <label>Contact Email</label>
+                                    <input type="email" value="premamsilks@gmail.com" id="settingEmail">
+                                </div>
+                                <div class="settings-group">
+                                    <label>WhatsApp Number</label>
+                                    <input type="tel" value="+917200123457" id="settingWhatsApp">
+                                </div>
+                                <div class="settings-group">
+                                    <label>Free Shipping Threshold (₹)</label>
+                                    <input type="number" value="25000" id="settingFreeShipping">
+                                </div>
+                                <div class="settings-group">
+                                    <label>Shipping Cost (₹)</label>
+                                    <input type="number" value="500" id="settingShippingCost">
+                                </div>
+                                <div class="settings-group">
+                                    <label>GST (%)</label>
+                                    <input type="number" value="5" id="settingGST">
+                                </div>
+                                <button type="submit" class="btn-admin primary">Save Settings</button>
+                            </form>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-header">
+                                <h3>Razorpay Configuration</h3>
+                            </div>
+                            <form class="settings-form" id="razorpaySettingsForm">
+                                <div class="settings-group">
+                                    <label>Razorpay Key ID</label>
+                                    <input type="text" placeholder="rzp_live_xxxxxxxxxxxx" id="settingRazorpayKey">
+                                </div>
+                                <div class="settings-group">
+                                    <label>Mode</label>
+                                    <select id="settingRazorpayMode">
+                                        <option value="test">Test Mode</option>
+                                        <option value="live">Live Mode</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-admin primary">Save Razorpay Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PRODUCT MODAL -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="productModalOverlay">
+        <div class="modal" id="productModal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Product</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form class="modal-form" id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label>Saree Code *</label>
+                        <input type="text" id="productCode" required placeholder="e.g., ES001">
+                    </div>
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="productName" required
+                            placeholder="e.g., Powder Blue Saree with Black Border">
+                    </div>
+                </div>
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="productCategory" required>
+                            <option value="">Select Category</option>
+                            <optgroup label="South India">
+                                <option value="Kanjivaram">Kanjivaram / Kanchipuram</option>
+                                <option value="Mysore">Mysore Silk</option>
+                                <option value="Gadwal">Gadwal</option>
+                            </optgroup>
+                            <optgroup label="North India">
+                                <option value="Banarasi">Banarasi</option>
+                                <option value="Chanderi">Chanderi</option>
+                                <option value="Bhagalpuri">Bhagalpuri</option>
+                            </optgroup>
+                            <optgroup label="East India">
+                                <option value="Tussar">Tussar / Kosa</option>
+                                <option value="Baluchari">Baluchari</option>
+                                <option value="Bomkai">Bomkai / Sambalpuri</option>
+                                <option value="Pochampally">Pochampally (Ikat)</option>
+                                <option value="Assam Muga">Assam Muga</option>
+                                <option value="Eri">Eri (Ahimsa) Silk</option>
+                            </optgroup>
+                            <optgroup label="West India">
+                                <option value="Paithani">Paithani</option>
+                                <option value="Patola">Patola</option>
+                            </optgroup>
+                            <optgroup label="Specialty">
+                                <option value="Organza">Organza Silk</option>
+                                <option value="Bridal">Bridal</option>
+                                <option value="Designer">Designer</option>
+                                <option value="Contemporary">Contemporary</option>
+                                <option value="Silk">Pure Silk</option>
+                            </optgroup>
+                            <optgroup label="International">
+                                <option value="Thai Silk">Thai Silk</option>
+                                <option value="Balinese Ikat">Balinese Ikat</option>
+                                <option value="Cambodian Silk">Cambodian Silk Krama</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <select id="productColor">
+                            <option value="">Select Color</option>
+                            <option value="Red">Red</option>
+                            <option value="Blue">Blue</option>
+                            <option value="Green">Green</option>
+                            <option value="Purple">Purple</option>
+                            <option value="Pink">Pink</option>
+                            <option value="Orange">Orange</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Black">Black</option>
+                            <option value="Teal">Teal</option>
+                            <option value="Maroon">Maroon</option>
+                            <option value="Copper">Copper</option>
+                            <option value="White">White</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input type="number" id="productPrice" required placeholder="45999" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Original Price (₹)</label>
+                        <input type="number" id="productOriginalPrice" placeholder="59999 (if on sale)">
+                    </div>
+                </div>
+                <div id="discountDisplay"
+                    style="display:none; margin: -4px 0 8px; padding: 6px 12px; background: #e6f5f2; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #0d6157;">
+                    Discount: <span id="discountPercent">0</span>% OFF
+                </div>
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label>Stock Quantity</label>
+                        <input type="number" id="productStock" value="10" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Occasion</label>
+                        <select id="productOccasion">
+                            <option value="">Select</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="festive">Festive</option>
+                            <option value="party">Party Wear</option>
+                            <option value="casual">Casual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Badge</label>
+                        <select id="productBadge">
+                            <option value="">None</option>
+                            <option value="new">New</option>
+                            <option value="sale">Sale</option>
+                            <option value="bestseller">Bestseller</option>
+                            <option value="exclusive">Exclusive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Image Upload Zone -->
+                <div class="form-group">
+                    <label>Product Images</label>
+                    <div class="image-upload-zone" id="imageUploadZone">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p>Drag & drop images here or <strong>click to browse</strong></p>
+                            <span>Supports JPG, PNG, WebP (max 50MB each)</span>
+                        </div>
+                        <input type="file" id="imageFileInput" multiple accept="image/*" style="display:none">
+                    </div>
+                    <div class="image-previews" id="imagePreviews"></div>
+                    <div class="image-url-fallback">
+                        <small>Or paste image URL:</small>
+                        <input type="text" id="productImage" placeholder="https://example.com/saree-image.jpg">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="productDescription" rows="3"
+                        placeholder="Describe the saree details, fabric, motifs..."></textarea>
+                </div>
+                <div class="form-row two-col">
+                    <div class="form-group checkbox-group">
+                        <label><input type="checkbox" id="productFeatured"> Featured Product</label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label><input type="checkbox" id="productActive" checked> Active (Visible on store)</label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-admin secondary" id="modalCancelBtn">Cancel</button>
+                    <button type="submit" class="btn-admin primary" id="modalSaveBtn">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ORDER DETAIL MODAL -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="orderModalOverlay">
+        <div class="modal modal-lg" id="orderModal">
+            <div class="modal-header">
+                <h3 id="orderModalTitle">Order Details</h3>
+                <button class="modal-close" id="orderModalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="orderModalBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="admin.js?v=2.0"></script>
+</body>
+
+</html>

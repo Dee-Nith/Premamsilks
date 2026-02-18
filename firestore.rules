@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── PRODUCTS ──────────────────────────────────────────
+    // Anyone can read products (public catalog)
+    // Only authenticated admins can write
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ─── CATEGORIES ────────────────────────────────────────
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── ORDERS ────────────────────────────────────────────
+    // Anyone can create an order (checkout flow)
+    // Only admins can read all orders or update status
+    // Customers can read their own order by ID (for confirmation page)
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read: if isAdmin() || isOrderOwner();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+
+      function isOrderOwner() {
+        return request.auth != null && 
+               resource.data.customer.email == request.auth.token.email;
+      }
+    }
+
+    // ─── SETTINGS ──────────────────────────────────────────
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── ADMIN HELPER ──────────────────────────────────────
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email in [
+               'premamsilks@gmail.com'
+             ];
+    }
+  }
+}

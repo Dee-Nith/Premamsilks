@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checkout - Complete your purchase at Premam Silks. Secure payment via Razorpay.">
+    <title>Checkout | Premam Silks</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <p>✨ Free Shipping on Orders Above ₹25,000 | <a href="shop.html">Shop Now</a></p>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-text">
+                    <span class="logo-name">PREMAM SILKS</span>
+                    <span class="logo-tagline">Timeless Sarees • Endless Love</span>
+                </div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="shop.html" class="nav-link">Sarees</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#cart" class="nav-icon" aria-label="Shopping Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span class="badge">0</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Checkout Progress -->
+    <div class="checkout-progress">
+        <div class="container">
+            <div class="progress-steps">
+                <a href="shop.html" class="progress-step completed">
+                    <span class="step-num">1</span>
+                    <span class="step-text">Shop</span>
+                </a>
+                <div class="progress-line completed"></div>
+                <span class="progress-step completed">
+                    <span class="step-num">2</span>
+                    <span class="step-text">Cart</span>
+                </span>
+                <div class="progress-line active"></div>
+                <span class="progress-step active">
+                    <span class="step-num">3</span>
+                    <span class="step-text">Checkout</span>
+                </span>
+                <div class="progress-line"></div>
+                <span class="progress-step">
+                    <span class="step-num">4</span>
+                    <span class="step-text">Confirmation</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Checkout -->
+    <main class="checkout-main">
+        <div class="container">
+            <div class="checkout-grid">
+                <!-- Left: Shipping Form -->
+                <div class="checkout-form-section">
+                    <h2>Shipping Details</h2>
+
+                    <form class="checkout-form" id="checkoutForm" autocomplete="on">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="checkout-name">Full Name *</label>
+                                <input type="text" id="checkout-name" name="name" placeholder="Enter your full name"
+                                    required autocomplete="name">
+                            </div>
+                        </div>
+
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="checkout-email">Email Address *</label>
+                                <input type="email" id="checkout-email" name="email" placeholder="you@example.com"
+                                    required autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-phone">Phone Number *</label>
+                                <input type="tel" id="checkout-phone" name="phone" placeholder="10-digit mobile number"
+                                    required autocomplete="tel">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checkout-address">Full Address *</label>
+                            <textarea id="checkout-address" name="address" rows="3"
+                                placeholder="House no, Street, Landmark" required
+                                autocomplete="street-address"></textarea>
+                        </div>
+
+                        <div class="form-row three-col">
+                            <div class="form-group">
+                                <label for="checkout-city">City *</label>
+                                <input type="text" id="checkout-city" name="city" placeholder="City" required
+                                    autocomplete="address-level2">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-state">State *</label>
+                                <select id="checkout-state" name="state" required autocomplete="address-level1">
+                                    <option value="">Select State</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                    <option value="Assam">Assam</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Goa">Goa</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                    <option value="Jharkhand">Jharkhand</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Manipur">Manipur</option>
+                                    <option value="Meghalaya">Meghalaya</option>
+                                    <option value="Mizoram">Mizoram</option>
+                                    <option value="Nagaland">Nagaland</option>
+                                    <option value="Odisha">Odisha</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Sikkim">Sikkim</option>
+                                    <option value="Tamil Nadu" selected>Tamil Nadu</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Tripura">Tripura</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Uttarakhand">Uttarakhand</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-pincode">Pincode *</label>
+                                <input type="text" id="checkout-pincode" name="pincode" placeholder="600001" required
+                                    autocomplete="postal-code" maxlength="6">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checkout-notes">Order Notes <span class="optional">(optional)</span></label>
+                            <textarea id="checkout-notes" name="notes" rows="2"
+                                placeholder="Special instructions, gift wrapping, etc."></textarea>
+                        </div>
+                    </form>
+
+                    <!-- Payment Section -->
+                    <div class="payment-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-options">
+                            <label class="payment-option selected">
+                                <input type="radio" name="payment" value="razorpay" checked>
+                                <div class="payment-option-content">
+                                    <span class="payment-name">Razorpay (UPI / Cards / Net Banking)</span>
+                                    <span class="payment-desc">Secure payment via Razorpay</span>
+                                </div>
+                                <div class="payment-icons">
+                                    <span class="pay-icon">UPI</span>
+                                    <span class="pay-icon">💳</span>
+                                    <span class="pay-icon">🏦</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-lg btn-block pay-btn" id="payBtn">
+                            🔒 Pay Now
+                        </button>
+
+                        <p class="checkout-secure-note">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Your payment is secured with 256-bit SSL encryption
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="checkout-summary-section">
+                    <div class="order-summary-card">
+                        <h3>Order Summary</h3>
+                        <div id="orderSummary">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Need Help -->
+                    <div class="checkout-help">
+                        <h4>Need Help?</h4>
+                        <a href="https://wa.me/917200123457?text=Hi!%20I%20need%20help%20with%20my%20order"
+                            target="_blank" class="help-whatsapp">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="#25D366">
+                                <path
+                                    d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
+                            </svg>
+                            Chat on WhatsApp
+                        </a>
+                        <a href="tel:+917200123457" class="help-phone">📞 +91 7200123457</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (simplified) -->
+    <footer class="footer" style="margin-top: 0;">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 32px;">
+                <p>&copy; 2026 Premam Silks. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a
+                        href="terms.html">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/script.js"></script>
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+
+</html>

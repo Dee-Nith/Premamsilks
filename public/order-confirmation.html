@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | Premam Silks</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <style>
+        .confirmation-page {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            background: var(--color-bg-alt, #faf8f5);
+        }
+
+        .confirmation-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 640px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #25D366, #20b858);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: popIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .confirmation-icon svg {
+            color: #fff;
+        }
+
+        .confirmation-card h1 {
+            font-family: var(--font-heading, 'Cormorant Garamond', serif);
+            font-size: 2rem;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .confirmation-card .subtitle {
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 32px;
+        }
+
+        .order-details {
+            background: #faf8f5;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .order-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-detail-row .label {
+            color: #888;
+        }
+
+        .order-detail-row .value {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .order-items-list {
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .order-items-list h3 {
+            font-family: var(--font-heading, 'Cormorant Garamond', serif);
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #1a1a2e;
+        }
+
+        .order-item-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item-row img {
+            width: 48px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .order-item-row .item-info {
+            flex: 1;
+        }
+
+        .order-item-row .item-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+        }
+
+        .order-item-row .item-qty {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .order-item-row .item-price {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .confirmation-actions .btn {
+            padding: 12px 28px;
+            font-size: 0.9rem;
+        }
+
+        .whatsapp-share {
+            background: #25D366;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .whatsapp-share:hover {
+            background: #20b858;
+        }
+
+        @media (max-width: 500px) {
+            .confirmation-card {
+                padding: 28px 20px;
+            }
+
+            .confirmation-card h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-text">
+                    <span class="logo-name">PREMAM SILKS</span>
+                    <span class="logo-tagline">Timeless Sarees • Endless Love</span>
+                </div>
+            </a>
+        </nav>
+    </header>
+
+    <!-- Progress -->
+    <div class="checkout-progress">
+        <div class="container">
+            <div class="progress-steps">
+                <span class="progress-step completed">
+                    <span class="step-num">✓</span>
+                    <span class="step-text">Shop</span>
+                </span>
+                <div class="progress-line completed"></div>
+                <span class="progress-step completed">
+                    <span class="step-num">✓</span>
+                    <span class="step-text">Cart</span>
+                </span>
+                <div class="progress-line completed"></div>
+                <span class="progress-step completed">
+                    <span class="step-num">✓</span>
+                    <span class="step-text">Checkout</span>
+                </span>
+                <div class="progress-line completed"></div>
+                <span class="progress-step active">
+                    <span class="step-num">4</span>
+                    <span class="step-text">Confirmation</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation -->
+    <main class="confirmation-page">
+        <div class="confirmation-card">
+            <div class="confirmation-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+
+            <h1>Thank You for Your Order!</h1>
+            <p class="subtitle">Your order has been placed successfully. We'll send you updates via email and WhatsApp.
+            </p>
+
+            <div class="order-details" id="orderDetails">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="order-items-list" id="orderItemsList">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="confirmation-actions">
+                <a href="shop.html" class="btn btn-primary">Continue Shopping</a>
+                <a href="#" id="whatsappShare" class="btn whatsapp-share" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+                        <path
+                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654z" />
+                    </svg>
+                    Share via WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 0;">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 32px;">
+                <p>&copy; 2026 Premam Silks. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load order from localStorage
+            const orderData = JSON.parse(localStorage.getItem('premam_last_order') || '{}');
+
+            const detailsEl = document.getElementById('orderDetails');
+            const itemsEl = document.getElementById('orderItemsList');
+            const whatsappBtn = document.getElementById('whatsappShare');
+
+            if (!orderData.orderId) {
+                detailsEl.innerHTML = '<p>No order found. <a href="shop.html">Go shopping!</a></p>';
+                return;
+            }
+
+            // Format price
+            function formatPrice(amount) {
+                return '₹' + Number(amount).toLocaleString('en-IN');
+            }
+
+            // Render order details
+            detailsEl.innerHTML = `
+        <div class="order-detail-row">
+          <span class="label">Order ID</span>
+          <span class="value">#${orderData.orderId}</span>
+        </div>
+        <div class="order-detail-row">
+          <span class="label">Date</span>
+          <span class="value">${new Date(orderData.paidAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        </div>
+        <div class="order-detail-row">
+          <span class="label">Payment ID</span>
+          <span class="value">${orderData.razorpayPaymentId || '—'}</span>
+        </div>
+        <div class="order-detail-row">
+          <span class="label">Items</span>
+          <span class="value">${orderData.itemCount} item(s)</span>
+        </div>
+        <div class="order-detail-row">
+          <span class="label">Shipping To</span>
+          <span class="value">${orderData.shippingAddress?.city || ''}, ${orderData.shippingAddress?.state || ''}</span>
+        </div>
+        <div class="order-detail-row">
+          <span class="label">Total Paid</span>
+          <span class="value" style="color: #25D366; font-size: 1.1rem;">${formatPrice(orderData.totalAmount)}</span>
+        </div>
+      `;
+
+            // Render items
+            if (orderData.items && orderData.items.length > 0) {
+                itemsEl.innerHTML = `
+          <h3>Your Items</h3>
+          ${orderData.items.map(item => `
+            <div class="order-item-row">
+              <img src="${item.image}" alt="${item.name}">
+              <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-qty">Qty: ${item.quantity}</div>
+              </div>
+              <div class="item-price">${formatPrice(item.price * item.quantity)}</div>
+            </div>
+          `).join('')}
+        `;
+            }
+
+            // WhatsApp share
+            const msg = `🎉 I just ordered from Premam Silks! Order #${orderData.orderId} — ${orderData.itemCount} beautiful saree(s). Check them out at premamsilks.com!`;
+            whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        });
+    </script>
+</body>
+
+</html>

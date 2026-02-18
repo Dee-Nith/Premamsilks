@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Premam Silks - Discover exquisite handwoven silk sarees. Timeless Kanjivaram, Banarasi, and contemporary designs crafted with love. Worldwide shipping available.">
+  <meta name="keywords"
+    content="silk sarees, Kanjivaram sarees, Banarasi silk, bridal sarees, wedding sarees, handwoven sarees, Indian sarees">
+  <title>Premam Silks | Timeless Sarees • Endless Love</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/cart.css">
+</head>
+
+<body>
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <p>✨ Free Shipping on Orders Above ₹25,000 | <a href="shop.html">Shop Now</a></p>
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <nav class="nav-container">
+      <!-- Logo -->
+      <a href="index.html" class="logo">
+        <div class="logo-text">
+          <span class="logo-name">PREMAM SILKS</span>
+          <span class="logo-tagline">Timeless Sarees • Endless Love</span>
+        </div>
+      </a>
+
+      <!-- Navigation Menu -->
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="shop.html" class="nav-link">Sarees</a></li>
+        <li><a href="collections.html" class="nav-link">Collections</a></li>
+        <li><a href="about.html" class="nav-link">About Us</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Navigation Icons -->
+      <div class="nav-icons">
+        <button class="nav-icon" id="searchBtn" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+        <a href="#wishlist" class="nav-icon" aria-label="Wishlist">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span class="badge">0</span>
+        </a>
+        <a href="#cart" class="nav-icon" aria-label="Shopping Cart">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span class="badge">0</span>
+        </a>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <span
+        style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 500; letter-spacing: 0.15em;">PREMAM
+        SILKS</span>
+      <button class="mobile-nav-close" id="mobileNavClose">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Sarees</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-slider">
+      <!-- Slide 1 - Teal Kanjivaram -->
+      <div class="hero-slide active">
+        <img src="images/hero-1.png" alt="Luxurious Teal and Gold Kanjivaram Silk Saree">
+        <div class="hero-overlay"></div>
+      </div>
+      <!-- Slide 2 - Red Bridal -->
+      <div class="hero-slide">
+        <img src="images/hero-2.png" alt="Magnificent Red Bridal Silk Saree">
+        <div class="hero-overlay"></div>
+      </div>
+      <!-- Slide 3 - Purple Modern -->
+      <div class="hero-slide">
+        <img src="images/hero-3.png" alt="Purple Banarasi Silk Saree">
+        <div class="hero-overlay"></div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <span class="tagline animate-slide-down">New Collection 2026</span>
+      <h1 class="animate-slide-up delay-100">Timeless Elegance, Woven with Love</h1>
+      <p class="animate-slide-up delay-200">Discover our exquisite collection of handwoven silk sarees, where every
+        thread tells a story of tradition and craftsmanship passed down through generations.</p>
+      <div class="hero-buttons animate-slide-up delay-300">
+        <a href="shop.html" class="btn btn-accent btn-lg">Shop Collection</a>
+        <a href="about.html" class="btn btn-white btn-lg">Our Story</a>
+      </div>
+    </div>
+
+    <div class="hero-dots">
+      <button class="hero-dot active" data-slide="0"></button>
+      <button class="hero-dot" data-slide="1"></button>
+      <button class="hero-dot" data-slide="2"></button>
+    </div>
+  </section>
+
+  <!-- Featured Collections -->
+  <section class="section" id="collections">
+    <div class="container">
+      <div class="section-header">
+        <span class="tagline">Curated For You</span>
+        <h2>Our Collections</h2>
+        <p>Explore our handpicked collections, each celebrating the rich heritage of Indian silk weaving with a
+          contemporary twist.</p>
+      </div>
+
+      <div class="collections-grid">
+        <!-- Collection 1 - Bridal -->
+        <div class="collection-card">
+          <img src="images/collection-1.png" alt="Bridal Collection">
+          <div class="collection-card-overlay">
+            <h3>Bridal Royale</h3>
+            <p>Magnificent wedding sarees for your special day</p>
+            <a href="collections.html#bridal" class="btn btn-white btn-sm">View Collection</a>
+          </div>
+        </div>
+
+        <!-- Collection 2 - Contemporary -->
+        <div class="collection-card">
+          <img src="images/collection-2.png" alt="Contemporary Collection">
+          <div class="collection-card-overlay">
+            <h3>Modern Muse</h3>
+            <p>Contemporary designs for the modern woman</p>
+            <a href="collections.html#modern" class="btn btn-white btn-sm">View Collection</a>
+          </div>
+        </div>
+
+        <!-- Collection 3 - Exclusive -->
+        <div class="collection-card">
+          <img src="images/collection-3.png" alt="Exclusive Collection">
+          <div class="collection-card-overlay">
+            <h3>One of a Kind</h3>
+            <p>Exclusive designer pieces, truly unique</p>
+            <a href="collections.html#exclusive" class="btn btn-white btn-sm">View Collection</a>
+          </div>
+        </div>
+
+        <!-- Collection 4 - Heritage -->
+        <div class="collection-card">
+          <img src="images/hero-1.png" alt="Heritage Collection">
+          <div class="collection-card-overlay">
+            <h3>Heritage Classics</h3>
+            <p>Timeless traditional Kanjivaram weaves</p>
+            <a href="collections.html#heritage" class="btn btn-white btn-sm">View Collection</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="section" style="background: var(--color-bg-alt);">
+    <div class="container">
+      <div class="section-header">
+        <span class="tagline">Bestsellers</span>
+        <h2>Loved By Our Customers</h2>
+        <p>Our most cherished pieces, each a testament to exquisite craftsmanship and timeless beauty.</p>
+      </div>
+
+      <div class="products-grid">
+        <!-- Product 1 - Purple -->
+        <div class="product-card">
+          <div class="product-image">
+            <img src="images/product-1.png" alt="Purple Kanjivaram Silk Saree" class="main-image">
+            <div class="product-badges">
+              <span class="product-badge new">New</span>
+            </div>
+            <div class="product-actions">
+              <button class="product-action-btn" aria-label="Quick View">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button class="product-action-btn" aria-label="Add to Wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <span class="product-category">Kanjivaram</span>
+            <h4 class="product-name">Royal Purple Zari Silk Saree</h4>
+            <div class="product-price">
+              <span class="current">₹45,999</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 - Blue Banarasi -->
+        <div class="product-card">
+          <div class="product-image">
+            <img src="images/product-2.png" alt="Royal Blue Banarasi Silk Saree" class="main-image">
+            <div class="product-badges">
+              <span class="product-badge sale">Sale</span>
+            </div>
+            <div class="product-actions">
+              <button class="product-action-btn" aria-label="Quick View">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button class="product-action-btn" aria-label="Add to Wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <span class="product-category">Banarasi</span>
+            <h4 class="product-name">Royal Blue Brocade Silk Saree</h4>
+            <div class="product-price">
+              <span class="current">₹52,499</span>
+              <span class="original">₹59,999</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 - Orange -->
+        <div class="product-card">
+          <div class="product-image">
+            <img src="images/product-3.png" alt="Orange Gold Kanjivaram Saree" class="main-image">
+            <div class="product-actions">
+              <button class="product-action-btn" aria-label="Quick View">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button class="product-action-btn" aria-label="Add to Wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <span class="product-category">Kanjivaram</span>
+            <h4 class="product-name">Sunset Orange Temple Border Saree</h4>
+            <div class="product-price">
+              <span class="current">₹38,999</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 - Hero/Teal -->
+        <div class="product-card">
+          <div class="product-image">
+            <img src="images/hero-1.png" alt="Teal Kanjivaram Saree" class="main-image">
+            <div class="product-badges">
+              <span class="product-badge new">Exclusive</span>
+            </div>
+            <div class="product-actions">
+              <button class="product-action-btn" aria-label="Quick View">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button class="product-action-btn" aria-label="Add to Wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <span class="product-category">One of a Kind</span>
+            <h4 class="product-name">Teal Heritage Silk Masterpiece</h4>
+            <div class="product-price">
+              <span class="current">₹67,999</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: var(--space-10);">
+        <a href="shop.html" class="btn btn-primary btn-lg">View All Sarees</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Premam Silks -->
+  <section class="section features">
+    <div class="container">
+      <div class="section-header">
+        <span class="tagline" style="color: var(--color-accent-light);">Why Choose Us</span>
+        <h2 style="color: var(--color-white);">The Premam Promise</h2>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h4>100% Pure Silk</h4>
+          <p>Every saree comes with an authenticity guarantee. We source only the finest quality silk from trusted
+            weavers.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+          </div>
+          <h4>Handcrafted Excellence</h4>
+          <p>Each piece is handwoven by master artisans, preserving centuries-old techniques and creating unique
+            masterpieces.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h4>Worldwide Shipping</h4>
+          <p>We deliver our precious creations across the globe with secure packaging and tracking for your peace of
+            mind.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+            </svg>
+          </div>
+          <h4>7-Day Easy Returns</h4>
+          <p>Shop with confidence. Not completely in love? Return within 7 days for a hassle-free exchange or refund.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section testimonials">
+    <div class="container">
+      <div class="section-header">
+        <span class="tagline">Testimonials</span>
+        <h2>What Our Customers Say</h2>
+      </div>
+
+      <div class="testimonials-slider">
+        <div class="testimonial-card" id="testimonialActive">
+          <div class="testimonial-rating">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+          <p class="testimonial-text">"The most beautiful Kanjivaram I've ever owned. The craftsmanship is impeccable
+            and the colors are exactly as shown. Received so many compliments at my daughter's wedding!"</p>
+          <div class="testimonial-author">
+            <h5>Priya Venkatesh</h5>
+            <span>Chennai, Tamil Nadu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section newsletter">
+    <div class="container">
+      <h2>Join the Premam Family</h2>
+      <p>Subscribe to receive exclusive previews, special offers, and styling tips. Get 5% off your first order!</p>
+
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="Enter your email address" required>
+        <button type="submit" class="btn btn-accent">Subscribe</button>
+      </form>
+
+      <div class="newsletter-benefits">
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          Early Access to New Collections
+        </span>
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          Exclusive Member Discounts
+        </span>
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          Styling Tips & Trends
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand Column -->
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span
+              style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 500; letter-spacing: 0.15em; color: var(--color-white);">PREMAM
+              SILKS</span>
+          </a>
+          <p>Premam Silks brings you the finest handwoven silk sarees, where every thread is woven with love and every
+            design tells a story of timeless elegance.</p>
+          <div class="footer-social">
+            <a href="https://instagram.com/premam.silks" target="_blank" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            </a>
+            <a href="https://facebook.com/premamsilks" target="_blank" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
+              </svg>
+            </a>
+            <a href="https://wa.me/917200123457" target="_blank" aria-label="WhatsApp">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+              </svg>
+            </a>
+            <a href="https://youtube.com/@premamsilks" target="_blank" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-column">
+          <h4>Shop</h4>
+          <ul class="footer-links">
+            <li><a href="shop.html">All Sarees</a></li>
+            <li><a href="collections.html#kanjivaram">Kanjivaram</a></li>
+            <li><a href="collections.html#banarasi">Banarasi</a></li>
+            <li><a href="collections.html#bridal">Bridal Collection</a></li>
+            <li><a href="shop.html?filter=new">New Arrivals</a></li>
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div class="footer-column">
+          <h4>Help</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="shipping.html">Shipping Info</a></li>
+            <li><a href="returns.html">Returns & Exchange</a></li>
+            <li><a href="size-guide.html">Size Guide</a></li>
+            <li><a href="care-guide.html">Care Instructions</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="footer-column">
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li><a href="tel:+917200123457">+91 7200123457</a></li>
+            <li><a href="mailto:premamsilks@gmail.com">premamsilks@gmail.com</a></li>
+            <li>Chennai, Tamil Nadu</li>
+            <li>India</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Premam Silks. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a
+            href="terms.html">Terms of Service</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/917200123457?text=Hello!%20I'm%20interested%20in%20your%20sarees." target="_blank"
+    class="whatsapp-float" aria-label="Chat on WhatsApp"
+    style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); z-index: 999; transition: transform 0.3s ease;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white">
+      <path
+        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+    </svg>
+  </a>
+
+  <!-- Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Premam Silks — Seed Product Data</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 1rem;
+        }
+
+        .status {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .log {
+            padding: 0.3rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .log.success {
+            color: #4ade80;
+        }
+
+        .log.error {
+            color: #f87171;
+        }
+
+        .log.info {
+            color: #38bdf8;
+        }
+
+        button {
+            background: #0d6157;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        button:hover {
+            background: #0a4f47;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .summary {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .summary h3 {
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🛍️ Premam Silks — Product Data Seeder</h1>
+    <p>Seeds the Firestore database with sample saree product data for testing and development.</p>
+
+    <div class="summary">
+        <h3>What this does:</h3>
+        <ul>
+            <li>Creates <strong>categories</strong> collection (Kanjivaram, Banarasi, etc.)</li>
+            <li>Creates <strong>products</strong> collection with 20 sample sarees</li>
+            <li>All products use placeholder Cloudinary URLs (replace with real images later)</li>
+        </ul>
+    </div>
+
+    <button id="seedBtn" onclick="seedAll()">🌱 Seed All Data</button>
+    <button id="clearBtn" class="btn-danger" onclick="clearAll()">🗑️ Clear All Data</button>
+
+    <div class="status" id="statusLog">
+        <div class="log info">Ready. Click "Seed All Data" to begin.</div>
+    </div>
+
+    <!-- Firebase SDKs (compat for simplicity) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        // ─── Firebase Config ───
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5IC5VZx6crO3LiUNvXjKs5eM081L6ihA",
+            authDomain: "premamsilks-ae138.firebaseapp.com",
+            projectId: "premamsilks-ae138",
+            storageBucket: "premamsilks-ae138.firebasestorage.app",
+            messagingSenderId: "796854948336",
+            appId: "1:796854948336:web:6ae436baa131812b014d35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const statusLog = document.getElementById('statusLog');
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            statusLog.prepend(div);
+        }
+
+        // ─── CATEGORIES ───
+        const categories = [
+            { id: 'kanjivaram', name: 'Kanjivaram', description: 'Traditional handwoven silk from Tamil Nadu', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Kanjivaram', order: 1 },
+            { id: 'banarasi', name: 'Banarasi', description: 'Opulent brocade silk from Varanasi', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Banarasi', order: 2 },
+            { id: 'tussar', name: 'Tussar', description: 'Rich textured silk with natural gold sheen', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Tussar', order: 3 },
+            { id: 'pattu', name: 'Pattu', description: 'Classic South Indian pure silk sarees', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Pattu', order: 4 },
+            { id: 'cotton-silk', name: 'Cotton Silk', description: 'Comfortable blend of cotton and silk', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Cotton+Silk', order: 5 },
+            { id: 'bridal', name: 'Bridal', description: 'Wedding special heavy silk sarees', image: 'https://placehold.co/400x300/0d6157/ffffff?text=Bridal', order: 6 },
+        ];
+
+        // ─── PRODUCTS ───
+        const products = [
+            // Kanjivaram Sarees
+            {
+                name: 'Royal Kanjivaram Silk Saree',
+                category: 'kanjivaram',
+                price: 28500,
+                originalPrice: 35000,
+                color: 'Maroon & Gold',
+                fabric: 'Pure Silk',
+                length: '6.3 meters',
+                work: 'Zari work with temple border',
+                occasion: 'Wedding',
+                description: 'Exquisite handwoven Kanjivaram silk saree in rich maroon with intricate gold zari work and traditional temple border. Perfect for South Indian weddings.',
+                image: 'https://placehold.co/600x800/8B1A2B/ffffff?text=Kanjivaram+Maroon',
+                images: ['https://placehold.co/600x800/8B1A2B/ffffff?text=Kanjivaram+Maroon'],
+                stock: 5,
+                featured: true,
+                isActive: true,
+                bestseller: true,
+                new: false
+            },
+            {
+                name: 'Emerald Green Kanjivaram',
+                category: 'kanjivaram',
+                price: 32000,
+                originalPrice: 40000,
+                color: 'Emerald Green & Gold',
+                fabric: 'Pure Silk',
+                length: '6.3 meters',
+                work: 'Grand zari pallu with peacock motifs',
+                occasion: 'Wedding',
+                description: 'Stunning emerald green Kanjivaram with grand gold zari pallu featuring traditional peacock motifs. A showstopper for bridal ceremonies.',
+                image: 'https://placehold.co/600x800/0d6157/ffffff?text=Kanjivaram+Green',
+                images: ['https://placehold.co/600x800/0d6157/ffffff?text=Kanjivaram+Green'],
+                stock: 3,
+                featured: true,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+            {
+                name: 'Royal Blue Kanjivaram',
+                category: 'kanjivaram',
+                price: 24500,
+                originalPrice: 30000,
+                color: 'Royal Blue & Silver',
+                fabric: 'Pure Silk',
+                length: '6.3 meters',
+                work: 'Silver zari with mango border',
+                occasion: 'Reception',
+                description: 'Elegant royal blue Kanjivaram with silver zari border featuring classic mango motifs. Perfect for receptions and engagements.',
+                image: 'https://placehold.co/600x800/1e3a8a/ffffff?text=Kanjivaram+Blue',
+                images: ['https://placehold.co/600x800/1e3a8a/ffffff?text=Kanjivaram+Blue'],
+                stock: 4,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+
+            // Banarasi Sarees
+            {
+                name: 'Crimson Banarasi Brocade',
+                category: 'banarasi',
+                price: 18500,
+                originalPrice: 22000,
+                color: 'Crimson Red',
+                fabric: 'Pure Silk Brocade',
+                length: '6.3 meters',
+                work: 'Mughal jaal pattern with meenakari',
+                occasion: 'Wedding',
+                description: 'Rich crimson Banarasi silk saree with all-over Mughal jaal pattern and meenakari work. Traditional Varanasi craftsmanship at its finest.',
+                image: 'https://placehold.co/600x800/dc2626/ffffff?text=Banarasi+Red',
+                images: ['https://placehold.co/600x800/dc2626/ffffff?text=Banarasi+Red'],
+                stock: 6,
+                featured: true,
+                isActive: true,
+                bestseller: true,
+                new: false
+            },
+            {
+                name: 'Pink Banarasi Silk',
+                category: 'banarasi',
+                price: 15500,
+                originalPrice: 19000,
+                color: 'Hot Pink',
+                fabric: 'Pure Katan Silk',
+                length: '6.3 meters',
+                work: 'Floral jaal with gold zari',
+                occasion: 'Festival',
+                description: 'Vibrant hot pink Banarasi katan silk with delicate floral jaal pattern woven in gold zari. Perfect for festive occasions.',
+                image: 'https://placehold.co/600x800/ec4899/ffffff?text=Banarasi+Pink',
+                images: ['https://placehold.co/600x800/ec4899/ffffff?text=Banarasi+Pink'],
+                stock: 8,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+            {
+                name: 'Teal Banarasi Organza',
+                category: 'banarasi',
+                price: 12000,
+                originalPrice: 15000,
+                color: 'Teal',
+                fabric: 'Organza Silk',
+                length: '6.3 meters',
+                work: 'Light zari weaving',
+                occasion: 'Party',
+                description: 'Lightweight teal Banarasi organza with subtle zari weaving. Contemporary styling meets traditional craftsmanship.',
+                image: 'https://placehold.co/600x800/0d9488/ffffff?text=Banarasi+Teal',
+                images: ['https://placehold.co/600x800/0d9488/ffffff?text=Banarasi+Teal'],
+                stock: 10,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+
+            // Tussar Sarees
+            {
+                name: 'Golden Tussar Silk',
+                category: 'tussar',
+                price: 9500,
+                originalPrice: 12000,
+                color: 'Natural Gold',
+                fabric: 'Pure Tussar Silk',
+                length: '5.5 meters',
+                work: 'Hand-painted madhubani art',
+                occasion: 'Casual',
+                description: 'Beautiful golden tussar silk with hand-painted madhubani art. Each piece is unique with natural silk texture and artisan craftsmanship.',
+                image: 'https://placehold.co/600x800/b45309/ffffff?text=Tussar+Gold',
+                images: ['https://placehold.co/600x800/b45309/ffffff?text=Tussar+Gold'],
+                stock: 7,
+                featured: true,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+            {
+                name: 'Tussar Silk with Kantha Work',
+                category: 'tussar',
+                price: 11000,
+                originalPrice: 14000,
+                color: 'Beige & Red',
+                fabric: 'Pure Tussar Silk',
+                length: '5.5 meters',
+                work: 'Hand-embroidered kantha stitch',
+                occasion: 'Festival',
+                description: 'Premium tussar silk in natural beige with vibrant red kantha hand-embroidery. A perfect fusion of two art traditions.',
+                image: 'https://placehold.co/600x800/a16207/ffffff?text=Tussar+Kantha',
+                images: ['https://placehold.co/600x800/a16207/ffffff?text=Tussar+Kantha'],
+                stock: 4,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+
+            // Pattu Sarees
+            {
+                name: 'Magenta Pattu Silk',
+                category: 'pattu',
+                price: 16500,
+                originalPrice: 20000,
+                color: 'Magenta & Gold',
+                fabric: 'Pure Pattu Silk',
+                length: '6.3 meters',
+                work: 'Traditional contrast border with buttas',
+                occasion: 'Wedding',
+                description: 'Classic magenta pattu silk saree with rich gold contrast border and traditional silk buttas. A South Indian wedding essential.',
+                image: 'https://placehold.co/600x800/a21caf/ffffff?text=Pattu+Magenta',
+                images: ['https://placehold.co/600x800/a21caf/ffffff?text=Pattu+Magenta'],
+                stock: 5,
+                featured: true,
+                isActive: true,
+                bestseller: true,
+                new: false
+            },
+            {
+                name: 'Yellow Pattu Silk',
+                category: 'pattu',
+                price: 14000,
+                originalPrice: 17500,
+                color: 'Turmeric Yellow',
+                fabric: 'Pure Pattu Silk',
+                length: '6.3 meters',
+                work: 'Checks pattern with temple border',
+                occasion: 'Festival',
+                description: 'Auspicious turmeric yellow pattu silk with classic checks pattern and temple border. Perfect for poojas and festive occasions.',
+                image: 'https://placehold.co/600x800/ca8a04/ffffff?text=Pattu+Yellow',
+                images: ['https://placehold.co/600x800/ca8a04/ffffff?text=Pattu+Yellow'],
+                stock: 6,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+            {
+                name: 'Violet Pattu Silk',
+                category: 'pattu',
+                price: 15500,
+                originalPrice: 19000,
+                color: 'Violet & Gold',
+                fabric: 'Pure Pattu Silk',
+                length: '6.3 meters',
+                work: 'Grand pallu with floral motifs',
+                occasion: 'Reception',
+                description: 'Gorgeous violet pattu silk with intricate gold floral motif pallu. A royal choice for receptions and special appearances.',
+                image: 'https://placehold.co/600x800/7c3aed/ffffff?text=Pattu+Violet',
+                images: ['https://placehold.co/600x800/7c3aed/ffffff?text=Pattu+Violet'],
+                stock: 4,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+
+            // Cotton Silk Sarees
+            {
+                name: 'Mint Green Cotton Silk',
+                category: 'cotton-silk',
+                price: 5500,
+                originalPrice: 7000,
+                color: 'Mint Green',
+                fabric: 'Cotton Silk Blend',
+                length: '5.5 meters',
+                work: 'Self-woven stripes',
+                occasion: 'Daily Wear',
+                description: 'Comfortable mint green cotton silk saree with self-woven stripe pattern. Lightweight and breathable for everyday elegance.',
+                image: 'https://placehold.co/600x800/10b981/ffffff?text=Cotton+Silk+Mint',
+                images: ['https://placehold.co/600x800/10b981/ffffff?text=Cotton+Silk+Mint'],
+                stock: 15,
+                featured: false,
+                isActive: true,
+                bestseller: true,
+                new: false
+            },
+            {
+                name: 'Navy Blue Cotton Silk',
+                category: 'cotton-silk',
+                price: 4800,
+                originalPrice: 6000,
+                color: 'Navy Blue',
+                fabric: 'Cotton Silk Blend',
+                length: '5.5 meters',
+                work: 'Silver thread border',
+                occasion: 'Office Wear',
+                description: 'Sophisticated navy blue cotton silk with elegant silver thread border. The perfect office-to-evening versatile saree.',
+                image: 'https://placehold.co/600x800/1e3a5f/ffffff?text=Cotton+Silk+Navy',
+                images: ['https://placehold.co/600x800/1e3a5f/ffffff?text=Cotton+Silk+Navy'],
+                stock: 12,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+            {
+                name: 'Peach Cotton Silk',
+                category: 'cotton-silk',
+                price: 5200,
+                originalPrice: 6500,
+                color: 'Peach',
+                fabric: 'Cotton Silk Blend',
+                length: '5.5 meters',
+                work: 'Block print design',
+                occasion: 'Casual',
+                description: 'Beautiful peach cotton silk with traditional block print design. Comfortable and stylish for casual outings.',
+                image: 'https://placehold.co/600x800/f97316/ffffff?text=Cotton+Silk+Peach',
+                images: ['https://placehold.co/600x800/f97316/ffffff?text=Cotton+Silk+Peach'],
+                stock: 10,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+
+            // Bridal Sarees
+            {
+                name: 'Grand Bridal Red Kanjivaram',
+                category: 'bridal',
+                price: 55000,
+                originalPrice: 65000,
+                color: 'Bridal Red & Gold',
+                fabric: 'Heavy Pure Silk',
+                length: '6.3 meters',
+                work: 'Grand zari with stones and kundan',
+                occasion: 'Wedding',
+                description: 'The ultimate bridal Kanjivaram in traditional auspicious red with heavy gold zari, stone embellishments, and kundan work. Handwoven in Kanchipuram with 3-shuttle technique.',
+                image: 'https://placehold.co/600x800/991b1b/ffffff?text=Bridal+Red',
+                images: ['https://placehold.co/600x800/991b1b/ffffff?text=Bridal+Red'],
+                stock: 2,
+                featured: true,
+                isActive: true,
+                bestseller: true,
+                new: false
+            },
+            {
+                name: 'Bridal Magenta Heavy Silk',
+                category: 'bridal',
+                price: 48000,
+                originalPrice: 58000,
+                color: 'Deep Magenta & Gold',
+                fabric: 'Heavy Pure Silk',
+                length: '6.3 meters',
+                work: 'Double-sided zari with contrast pallu',
+                occasion: 'Wedding',
+                description: 'Magnificent bridal magenta heavy silk with double-sided zari weaving and stunning contrast gold pallu. A heritage piece for the modern bride.',
+                image: 'https://placehold.co/600x800/86198f/ffffff?text=Bridal+Magenta',
+                images: ['https://placehold.co/600x800/86198f/ffffff?text=Bridal+Magenta'],
+                stock: 2,
+                featured: true,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+            {
+                name: 'Bridal Off-White & Gold',
+                category: 'bridal',
+                price: 42000,
+                originalPrice: 50000,
+                color: 'Off-White & Antique Gold',
+                fabric: 'Heavy Pure Silk',
+                length: '6.3 meters',
+                work: 'Antique gold tissue work with pearl motifs',
+                occasion: 'Reception',
+                description: 'Elegant off-white bridal silk with antique gold tissue work and pearl-inspired motifs. A contemporary bridal choice for modern ceremonies.',
+                image: 'https://placehold.co/600x800/f5f0e1/333333?text=Bridal+White',
+                images: ['https://placehold.co/600x800/f5f0e1/333333?text=Bridal+White'],
+                stock: 3,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: true
+            },
+            {
+                name: 'Classic Orange Silk',
+                category: 'pattu',
+                price: 13500,
+                originalPrice: 16500,
+                color: 'Orange & Bronze',
+                fabric: 'Pure Pattu Silk',
+                length: '6.3 meters',
+                work: 'Bronze zari with leaf motifs',
+                occasion: 'Festival',
+                description: 'Vibrant orange pattu silk with bronze zari border and leaf motifs. A cheerful choice for temple visits and festivals.',
+                image: 'https://placehold.co/600x800/ea580c/ffffff?text=Pattu+Orange',
+                images: ['https://placehold.co/600x800/ea580c/ffffff?text=Pattu+Orange'],
+                stock: 7,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+            {
+                name: 'Olive Green Tussar',
+                category: 'tussar',
+                price: 8500,
+                originalPrice: 10500,
+                color: 'Olive Green',
+                fabric: 'Pure Tussar Silk',
+                length: '5.5 meters',
+                work: 'Block printed floral',
+                occasion: 'Casual',
+                description: 'Earthy olive green tussar silk with block-printed floral patterns. Natural dyes and artisan handwork make each piece one-of-a-kind.',
+                image: 'https://placehold.co/600x800/65a30d/ffffff?text=Tussar+Olive',
+                images: ['https://placehold.co/600x800/65a30d/ffffff?text=Tussar+Olive'],
+                stock: 9,
+                featured: false,
+                isActive: true,
+                bestseller: false,
+                new: false
+            },
+        ];
+
+        // ─── SEED FUNCTIONS ───
+        async function seedAll() {
+            const btn = document.getElementById('seedBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Seeding...';
+
+            try {
+                // Seed categories
+                log('📁 Seeding categories...', 'info');
+                for (const cat of categories) {
+                    const { id, ...data } = cat;
+                    await db.collection('categories').doc(id).set({
+                        ...data,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    log(`  ✓ Category: ${data.name}`, 'success');
+                }
+                log(`✅ ${categories.length} categories seeded!`, 'success');
+
+                // Seed products
+                log('📦 Seeding products...', 'info');
+                for (const product of products) {
+                    const discount = product.originalPrice
+                        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+                        : 0;
+
+                    await db.collection('products').add({
+                        ...product,
+                        discount,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    log(`  ✓ Product: ${product.name} — ₹${product.price.toLocaleString('en-IN')}`, 'success');
+                }
+                log(`✅ ${products.length} products seeded!`, 'success');
+
+                log('🎉 ALL DATA SEEDED SUCCESSFULLY! Go check your admin dashboard.', 'success');
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🌱 Seed All Data';
+        }
+
+        async function clearAll() {
+            if (!confirm('⚠️ This will DELETE all products and categories. Are you sure?')) return;
+
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Clearing...';
+
+            try {
+                // Clear products
+                const productsSnap = await db.collection('products').get();
+                const productBatch = db.batch();
+                productsSnap.forEach(doc => productBatch.delete(doc.ref));
+                await productBatch.commit();
+                log(`🗑️ Deleted ${productsSnap.size} products`, 'info');
+
+                // Clear categories
+                const catsSnap = await db.collection('categories').get();
+                const catBatch = db.batch();
+                catsSnap.forEach(doc => catBatch.delete(doc.ref));
+                await catBatch.commit();
+                log(`🗑️ Deleted ${catsSnap.size} categories`, 'info');
+
+                log('✅ All data cleared!', 'success');
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🗑️ Clear All Data';
+        }
+    </script>
+</body>
+
+</html>
