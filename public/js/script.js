@@ -148,12 +148,14 @@ document.addEventListener('DOMContentLoaded', function () {
     contactForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
+      const firstName = formData.get('firstName') || '';
+      const lastName = formData.get('lastName') || '';
       const data = {
-        name: formData.get('name') || this.querySelector('#contactName')?.value || '',
-        email: formData.get('email') || this.querySelector('#contactEmail')?.value || '',
-        phone: formData.get('phone') || this.querySelector('#contactPhone')?.value || '',
-        subject: formData.get('subject') || this.querySelector('#contactSubject')?.value || '',
-        message: formData.get('message') || this.querySelector('#contactMessage')?.value || ''
+        name: (firstName + ' ' + lastName).trim(),
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        subject: formData.get('subject') || '',
+        message: formData.get('message') || ''
       };
 
       if (!data.name || !data.email || !data.message) {

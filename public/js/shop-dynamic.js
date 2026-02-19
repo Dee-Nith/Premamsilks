@@ -77,15 +77,17 @@
         const originalPriceHTML = p.originalPrice && p.originalPrice > p.price
             ? `<span class="original">${formatPrice(p.originalPrice)}</span>` : '';
 
-        const whatsappMsg = encodeURIComponent(`Hi! I'm interested in ${p.name}${p.sareeCode ? ` (${p.sareeCode})` : ''}. Can you share more details?`);
+        const productLink = `product.html?id=${encodeURIComponent(p.id)}`;
+        const productPageUrl = `${window.location.origin}/${productLink}`;
+        const whatsappMsg = encodeURIComponent(`Hello! I'm interested in this saree:\n\n*${p.name}*\n${p.sareeCode ? `Saree Code: ${p.sareeCode}\n` : ''}Price: ${formatPrice(p.price || 0)}\n${p.category ? `Category: ${p.category}\n` : ''}\n${productPageUrl}`);
         const whatsappLink = `https://wa.me/917200123457?text=${whatsappMsg}`;
 
         return `
         <div class="product-card" data-category="${p.category || ''}" data-color="${p.color || ''}" data-price="${p.price || 0}" data-id="${p.id}">
-            <div class="product-image">
+            <a href="${productLink}" class="product-image" style="display:block;text-decoration:none;color:inherit;">
                 <img src="${mainImg}" alt="${p.name}" class="main-image" loading="lazy" onerror="this.src='images/placeholder.png'">
                 ${badgeHTML ? `<div class="product-badges">${badgeHTML}</div>` : ''}
-                <div class="product-actions">
+                <div class="product-actions" onclick="event.stopPropagation();">
                     <a href="${whatsappLink}" target="_blank" class="product-action-btn" aria-label="Enquire on WhatsApp" title="Enquire on WhatsApp">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
@@ -104,10 +106,10 @@
                         </svg>
                     </button>
                 </div>
-            </div>
+            </a>
             <div class="product-info">
-                <span class="product-category">${escapeHTML(p.category || 'Saree')}</span>
-                <h4 class="product-name">${escapeHTML(p.name || 'Untitled')}</h4>
+                <a href="${productLink}" style="text-decoration:none;color:inherit;"><span class="product-category">${escapeHTML(p.category || 'Saree')}</span></a>
+                <a href="${productLink}" style="text-decoration:none;color:inherit;"><h4 class="product-name">${escapeHTML(p.name || 'Untitled')}</h4></a>
                 ${p.sareeCode ? `<small style="color:#8a7e6b;font-size:0.7rem;">${p.sareeCode}</small>` : ''}
                 <div class="product-price">
                     <span class="current">${formatPrice(p.price || 0)}</span>
@@ -346,6 +348,18 @@
     function init() {
         initFilters();
         initCartButtons();
+
+        // Apply category filter from URL parameter (e.g. ?category=kanjivaram)
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlCategory = urlParams.get('category');
+        if (urlCategory) {
+            var checkbox = document.querySelector('input[name="category"][value="' + CSS.escape(urlCategory) + '"]');
+            if (checkbox) {
+                checkbox.checked = true;
+                activeFilters.categories = [urlCategory];
+            }
+        }
+
         loadProducts();
     }
 

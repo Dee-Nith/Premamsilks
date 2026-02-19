@@ -203,6 +203,48 @@ const PremamCheckout = (function () {
             theme: {
                 color: config.theme?.color || '#0d6157'
             },
+            config: {
+                display: {
+                    blocks: {
+                        upi: {
+                            name: "Pay via UPI",
+                            instruments: [
+                                { method: "upi", flows: ["qr", "collect", "intent"] }
+                            ]
+                        },
+                        card: {
+                            name: "Pay via Card",
+                            instruments: [
+                                { method: "card" }
+                            ]
+                        },
+                        netbanking: {
+                            name: "Pay via Netbanking",
+                            instruments: [
+                                { method: "netbanking" }
+                            ]
+                        },
+                        wallet: {
+                            name: "Pay via Wallet",
+                            instruments: [
+                                { method: "wallet" }
+                            ]
+                        }
+                    },
+                    sequence: ["block.upi", "block.card", "block.netbanking", "block.wallet"],
+                    preferences: {
+                        show_default_blocks: false
+                    }
+                }
+            },
+            method: {
+                upi: true,
+                card: true,
+                netbanking: true,
+                wallet: true,
+                emi: false,
+                paylater: false
+            },
             handler: async function (response) {
                 await handlePaymentSuccess(orderResult.orderId, response);
             },

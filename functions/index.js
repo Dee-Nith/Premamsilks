@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -241,7 +242,7 @@ exports.submitContact = functions
           return res.status(400).json({ error: "Invalid email address" });
         }
 
-        await db.collection("contactMessages").add({
+        const contactData = {
           name: name.trim(),
           email: email.trim().toLowerCase(),
           phone: (phone || "").trim(),
@@ -249,7 +250,46 @@ exports.submitContact = functions
           message: message.trim(),
           read: false,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        };
+
+        await db.collection("contactMessages").add(contactData);
+
+        // Send email notification
+        try {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.GMAIL_USER,
+              pass: process.env.GMAIL_APP_PASSWORD,
+            },
+          });
+
+          await transporter.sendMail({
+            from: `"Premam Silks Website" <${process.env.GMAIL_USER}>`,
+            to: process.env.GMAIL_USER,
+            replyTo: contactData.email,
+            subject: `New Contact: ${contactData.subject} — from ${contactData.name}`,
+            html: `
+              <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+                <h2 style="color:#8B1A2B;border-bottom:2px solid #8B1A2B;padding-bottom:10px;">New Contact Form Message</h2>
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr><td style="padding:8px 0;font-weight:bold;color:#555;">Name:</td><td style="padding:8px 0;">${contactData.name}</td></tr>
+                  <tr><td style="padding:8px 0;font-weight:bold;color:#555;">Email:</td><td style="padding:8px 0;"><a href="mailto:${contactData.email}">${contactData.email}</a></td></tr>
+                  <tr><td style="padding:8px 0;font-weight:bold;color:#555;">Phone:</td><td style="padding:8px 0;">${contactData.phone || "Not provided"}</td></tr>
+                  <tr><td style="padding:8px 0;font-weight:bold;color:#555;">Subject:</td><td style="padding:8px 0;">${contactData.subject}</td></tr>
+                </table>
+                <div style="background:#f9f6f0;padding:16px;border-radius:8px;margin-top:16px;">
+                  <p style="font-weight:bold;color:#555;margin:0 0 8px;">Message:</p>
+                  <p style="margin:0;color:#333;white-space:pre-wrap;">${contactData.message}</p>
+                </div>
+                <p style="color:#aaa;font-size:12px;margin-top:24px;">Sent from Premam Silks website contact form</p>
+              </div>
+            `,
+          });
+        } catch (emailErr) {
+          console.error("Email notification failed:", emailErr.message);
+          // Don't fail the request if email fails — message is saved in Firestore
+        }
 
         return res.status(200).json({ success: true, message: "Message sent successfully" });
       } catch (error) {

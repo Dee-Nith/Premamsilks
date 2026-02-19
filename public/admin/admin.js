@@ -691,21 +691,48 @@ const AdminApp = (function () {
         openProductModal(product);
     }
 
-    async function deleteProduct(productId) {
-        if (!confirm('Are you sure you want to delete this product?')) return;
+    function deleteProduct(productId) {
+        const product = allProducts.find(p => p.id === productId);
+        const productName = product?.name || 'this product';
 
-        try {
-            if (db) {
-                await db.collection('products').doc(productId).delete();
+        // Custom confirmation dialog that won't disappear
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+            <div style="background:var(--admin-surface, #1e1e2e);border:1px solid var(--admin-border, #333);border-radius:12px;padding:28px;max-width:400px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+                <div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#ef4444" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <h3 style="color:#fff;margin:0 0 8px;font-size:1.1rem;">Delete Product?</h3>
+                <p style="color:#aaa;font-size:0.85rem;margin:0 0 24px;line-height:1.5;">Are you sure you want to delete <strong style="color:#fff;">${productName}</strong>? This action cannot be undone.</p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button id="confirmDeleteCancel" style="padding:10px 24px;border-radius:8px;border:1px solid var(--admin-border, #444);background:transparent;color:#ccc;cursor:pointer;font-size:0.85rem;font-weight:500;">Cancel</button>
+                    <button id="confirmDeleteYes" style="padding:10px 24px;border-radius:8px;border:none;background:#ef4444;color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;">Delete</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.querySelector('#confirmDeleteCancel').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        overlay.querySelector('#confirmDeleteYes').addEventListener('click', async () => {
+            overlay.remove();
+            try {
+                if (db) {
+                    await db.collection('products').doc(productId).delete();
+                }
+                allProducts = allProducts.filter(p => p.id !== productId);
+                renderProducts();
+                updateMetrics();
+                showNotification('Product deleted', 'success');
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                showNotification('Error deleting product', 'error');
             }
-            allProducts = allProducts.filter(p => p.id !== productId);
-            renderProducts();
-            updateMetrics();
-            showNotification('Product deleted', 'success');
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            showNotification('Error deleting product', 'error');
-        }
+        });
     }
 
     // ============================================================
