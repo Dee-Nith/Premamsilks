@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're Invited | Premam Silks Launch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #0d6157;
+            --color-primary-dark: #064e46;
+            --color-gold: #c6a87c;
+            --color-text: #f0fdfa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        .invitation-card {
+            background: linear-gradient(135deg, #0d6157 0%, #0f766e 100%);
+            width: 100%;
+            max-width: 600px;
+            padding: 3rem 2rem;
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            color: var(--color-text);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            /* Silk texture mimic */
+            background-image:
+                radial-gradient(at 0% 0%, rgba(255, 255, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.3) 0px, transparent 50%);
+        }
+
+        /* Gold Border Frame */
+        .border-frame {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid var(--color-gold);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Corner Ornaments */
+        .corner {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--color-gold);
+            z-index: 2;
+        }
+
+        .top-left {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .top-right {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Content Styles */
+        .content-wrapper {
+            position: relative;
+            z-index: 5;
+        }
+
+        .header-script {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3rem;
+            color: var(--color-gold);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .sub-header {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.75rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.8;
+            color: #a7f3d0;
+        }
+
+        .brand-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.8rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin: 0;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #cfb58c, #fbfbfb, #cfb58c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: var(--color-gold);
+            margin-top: 0.5rem;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .intro-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-style: italic;
+            opacity: 0.9;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .event-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            color: var(--color-gold);
+            font-weight: 600;
+            margin: 1.5rem auto;
+            border-top: 1px solid rgba(198, 168, 124, 0.4);
+            border-bottom: 1px solid rgba(198, 168, 124, 0.4);
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .details-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .detail-item h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--color-gold);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .detail-item p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .venue-section {
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .venue-section h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--color-gold);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .venue-address {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            opacity: 0.95;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dress-code {
+            margin-top: 2.5rem;
+            font-size: 0.9rem;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+            color: var(--color-gold);
+            border: 1px solid var(--color-gold);
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+        }
+
+        .footer-message {
+            margin-top: 3rem;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Leaf decoration (svg) */
+        .leaf-decor {
+            width: 100px;
+            height: auto;
+            opacity: 0.3;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .leaf-top {
+            top: -20px;
+            left: -20px;
+            transform: rotate(180deg);
+        }
+
+        .leaf-bottom {
+            bottom: -20px;
+            right: -20px;
+        }
+
+        @media (max-width: 480px) {
+            .invitation-card {
+                padding: 2rem 1rem;
+            }
+
+            .brand-name {
+                font-size: 2.8rem;
+            }
+
+            .event-title {
+                font-size: 1.6rem;
+            }
+
+            .details-grid {
+                gap: 1.5rem;
+            }
+
+            .header-script {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invitation-card">
+        <div class="border-frame"></div>
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+
+        <div class="content-wrapper">
+            <h2 class="header-script">You're Invited</h2>
+            <p class="sub-header">to a celebration of silk</p>
+
+            <h1 class="brand-name">Premam Silks</h1>
+            <p class="brand-tagline">Luxury & Artisanal</p>
+
+            <p class="intro-text">
+                With immense joy and gratitude, we invite you to step into a world of elegance as we mark a beautiful
+                new beginning.
+            </p>
+
+            <div class="event-title">
+                Pooja & Grand Launch
+            </div>
+
+            <p class="intro-text" style="font-size: 1.1rem; margin-bottom: 1rem;">
+                Followed by the official website launch and a celebratory breakfast.
+            </p>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <h4>Date</h4>
+                    <p>Friday, the 20th</p>
+                </div>
+                <div class="detail-item">
+                    <h4>Time</h4>
+                    <p>9:30 AM Onwards</p>
+                </div>
+            </div>
+
+            <div class="venue-section">
+                <h4>Venue</h4>
+                <p class="venue-address">
+                    7th Floor, Dadha Chamber No. 250,<br>
+                    V.P. Raman Road, Royapettah
+                </p>
+            </div>
+
+            <div class="dress-code">
+                DRESS CODE: Your Favourite Silk Saree
+            </div>
+
+            <p class="footer-message">
+                We can't wait to celebrate with you!
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -39,3 +39,9 @@ firebase-export-*/
 rzp-key.csv
 service-account.json
 functions/.env
+
+# Loose images / screenshots in root
+*.png
+*.jpg
+*.jpeg
+Screenshot*

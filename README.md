@@ -1,48 +1,100 @@
-# Premam Silks — E-Commerce Website
+# Premam Silks
 
-A premium e-commerce website for Premam Silks, featuring a dynamic product catalog, admin dashboard, and wishlist functionality.
+Premium silk saree e-commerce store built with vanilla HTML/CSS/JS and Firebase.
 
-## 🚀 Features
+**Live:** [premamsilks.com](https://premamsilks.com) | [premamsilks-ae138.web.app](https://premamsilks-ae138.web.app)
 
-- **Dynamic Product Catalog**: Products fetched from Firebase Firestore.
-- **Admin Dashboard**:
-    - Add/Edit/Delete products.
-    - Cloudinary image uploads (drag & drop).
-    - Manage categories and stock.
-- **Wishlist**: Persistent wishlist with local storage.
-- **Cart & Checkout**: Functional cart with WhatsApp enquiry integration.
-- **Responsive Design**: Mobile-friendly UI with glassmorphism effects.
+## Features
 
-## 📂 Project Structure
+- **Product Catalog** — Dynamic product pages with filtering by category (Banarasi, Kanjivaram, Paithani, etc.)
+- **Shopping Cart & Wishlist** — Persistent cart sidebar and wishlist using localStorage
+- **Checkout** — Order placement with WhatsApp enquiry integration (Razorpay payments coming soon)
+- **Admin Dashboard** — Add/edit/delete products, manage orders, Cloudinary image uploads
+- **Cloud Functions** — Secure server-side order creation, contact form, newsletter subscription
+- **Responsive Design** — Mobile-first with glassmorphism UI
+- **Silk Mark Certified** — Verified authentic silk products
+
+## Tech Stack
+
+- **Frontend:** HTML, CSS, JavaScript (vanilla)
+- **Backend:** Firebase Cloud Functions (Node.js)
+- **Database:** Firebase Firestore
+- **Hosting:** Firebase Hosting
+- **Images:** Cloudinary (with auto-compression)
+- **Auth:** Firebase Authentication (admin)
+
+## Project Structure
 
 ```
 PremamSilks/
-├── public/             # All website files (HTML, CSS, JS, Images)
-├── firebase.json       # Firebase Hosting config
-├── firestore.rules     # Database security rules
-└── README.md           # This file
+├── public/                  # Website files
+│   ├── admin/               # Admin dashboard
+│   ├── css/                 # Stylesheets
+│   ├── images/              # Static images & logo
+│   ├── js/                  # JavaScript modules
+│   │   ├── firebase-config.js
+│   │   ├── script.js
+│   │   ├── shop-dynamic.js
+│   │   ├── cart.js
+│   │   ├── wishlist.js
+│   │   └── checkout.js
+│   ├── utils/               # Utilities
+│   ├── index.html           # Homepage
+│   ├── shop.html            # Product listing
+│   ├── product.html         # Product detail
+│   ├── checkout.html        # Checkout page
+│   ├── about.html           # About us
+│   ├── contact.html         # Contact page
+│   └── ...                  # Policy pages, 404, etc.
+├── functions/               # Firebase Cloud Functions
+│   ├── index.js
+│   └── package.json
+├── firebase.json            # Firebase config
+├── firestore.rules          # Firestore security rules
+├── firestore.indexes.json   # Firestore indexes
+└── .gitignore
 ```
 
-## 🛠️ Setup & Development
+## Setup
 
-1.  **Clone the repository**.
-2.  **Serve locally**:
-    ```bash
-    npx http-server public -c-1
-    ```
-3.  **Open in browser**: `http://localhost:8080`
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/Dee-Nith/Premamsilks.git
+   cd Premamsilks
+   ```
 
-## 📦 Deployment
+2. Install Cloud Functions dependencies:
+   ```bash
+   cd functions && npm install && cd ..
+   ```
 
-The project is configured for **Firebase Hosting**.
+3. Serve locally:
+   ```bash
+   firebase serve
+   ```
+
+## Deployment
 
 ```bash
 firebase deploy
 ```
 
-## 🔑 Environment Variables
+Deploy only hosting:
+```bash
+firebase deploy --only hosting
+```
 
-- **Firebase Config**: Located in `js/firebase-config.js` (publicly safe).
-- **Cloudinary**: Configured in `admin/admin.js` (unsigned preset).
+Deploy only functions:
+```bash
+firebase deploy --only functions
+```
 
-> **Note**: Sensitive keys (Razorpay, etc.) are excluded from this repo via `.gitignore`.
+## Environment Variables
+
+- **Firebase Config** — `public/js/firebase-config.js` (public safe)
+- **Cloudinary** — Configured in `public/admin/admin.js` (unsigned preset)
+- **Razorpay Secret** — `functions/.env` (not committed)
+
+## License
+
+MIT

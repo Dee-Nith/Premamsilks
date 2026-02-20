@@ -135,6 +135,34 @@
     // -------------------------------------------------------
     // Render products
     // -------------------------------------------------------
+    // -------------------------------------------------------
+    // Category descriptions
+    // -------------------------------------------------------
+    const categoryDescriptions = {
+        kanjivaram: "Known as the 'Queen of Silks,' these are distinguished by their heavy gold zari and contrasting borders. Woven in Tamil Nadu using pure mulberry silk.",
+        banarasi: "Hailing from Varanasi, these are famous for their intricate Mughal-inspired motifs, gold/silver brocade, and heavy floral patterns.",
+        paithani: "The pride of Maharashtra, featuring a unique slanted square design border and a pallu decorated with peacocks and parrots."
+    };
+
+    function renderCategoryBanner() {
+        let existing = document.getElementById('categoryBanner');
+        if (existing) existing.remove();
+
+        if (activeFilters.categories.length !== 1) return;
+
+        const cat = activeFilters.categories[0];
+        const desc = categoryDescriptions[cat];
+        if (!desc) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'categoryBanner';
+        banner.style.cssText = 'grid-column:1/-1;background:linear-gradient(135deg,#faf7f0,#f5f0e6);border:1px solid #e8dcc8;border-radius:12px;padding:24px 28px;margin-bottom:8px;';
+        banner.innerHTML = '<h3 style="font-family:Cormorant Garamond,serif;font-size:1.5rem;color:#0d6157;margin:0 0 8px;">' + escapeHTML(cat.charAt(0).toUpperCase() + cat.slice(1)) + '</h3>' +
+            '<p style="color:#5a5245;font-size:0.92rem;line-height:1.6;margin:0;">' + escapeHTML(desc) + '</p>';
+
+        grid.prepend(banner);
+    }
+
     function renderProducts() {
         if (!grid) return;
 
@@ -151,6 +179,7 @@
                 </div>`;
         } else {
             grid.innerHTML = visible.map(p => productCardHTML(p)).join('');
+            renderCategoryBanner();
         }
 
         // Update count

@@ -1,16 +1,17 @@
 /**
- * PREMAM SILKS — Checkout & Razorpay Payment Module
+ * PREMAM SILKS — Checkout via WhatsApp
  *
- * Secure payment flow using Cloud Functions:
+ * Flow:
  * 1. User fills shipping details
- * 2. Click "Pay Now" → Cloud Function creates Razorpay order (verified amount)
- * 3. Open Razorpay modal → user pays
- * 4. On success → Cloud Function verifies signature + updates order + decrements stock
- * 5. Redirect to confirmation
+ * 2. Click "Place Order via WhatsApp" → validates form
+ * 3. Builds a formatted WhatsApp message with order details
+ * 4. Opens WhatsApp with pre-filled message to Premam Silks team
  */
 
 const PremamCheckout = (function () {
     'use strict';
+
+    const WHATSAPP_NUMBER = '917200123457';
 
     // ============================================================
     // FORM VALIDATION
@@ -73,6 +74,10 @@ const PremamCheckout = (function () {
         return div.innerHTML;
     }
 
+    function formatPrice(amount) {
+        return '₹' + Number(amount).toLocaleString('en-IN');
+    }
+
     function getFormData() {
         return {
             name: document.getElementById('checkout-name')?.value || '',
@@ -86,26 +91,11 @@ const PremamCheckout = (function () {
         };
     }
 
-    function setPayBtnState(loading, text) {
-        const payBtn = document.getElementById('payBtn');
-        if (!payBtn) return;
-        payBtn.disabled = loading;
-        payBtn.style.pointerEvents = loading ? 'none' : '';
-        payBtn.innerHTML = loading
-            ? '<span class="spinner"></span> ' + escapeHTML(text || 'Processing...')
-            : '🔒 Pay Now';
-    }
-
     // ============================================================
-    // PAYMENT FLOW (Cloud Functions)
+    // WHATSAPP ORDER FLOW
     // ============================================================
 
-    let isProcessing = false;
-
-    async function processPayment() {
-        if (isProcessing) return;
-        isProcessing = true;
-
+    function processOrder() {
         const formData = getFormData();
 
         // Validate form
@@ -116,201 +106,86 @@ const PremamCheckout = (function () {
             Object.entries(errors).forEach(([field, message]) => {
                 showFieldError(field, message);
             });
-            PremamCart.showToast('Please fix the errors above', 'error');
-            isProcessing = false;
+            if (window.PremamCart) PremamCart.showToast('Please fix the errors above', 'error');
             return;
         }
 
         // Check cart
-        if (PremamCart.getCount() === 0) {
-            PremamCart.showToast('Your cart is empty!', 'error');
-            isProcessing = false;
+        if (!window.PremamCart || PremamCart.getCount() === 0) {
+            if (window.PremamCart) PremamCart.showToast('Your cart is empty!', 'error');
             return;
         }
 
-        setPayBtnState(true, 'Creating order...');
+        const items = PremamCart.getItems();
+        const totals = PremamCart.getTotal();
 
-        try {
-            const cartItems = PremamCart.getItems();
-            const functionsUrl = window.PremamDB?.CloudFunctions;
+        // Build WhatsApp message
+        let msg = `🛍️ *NEW ORDER — Premam Silks*\n`;
+        msg += `━━━━━━━━━━━━━━━━━━\n\n`;
 
-            if (!functionsUrl?.createOrder) {
-                throw new Error('Payment service unavailable. Please try again later.');
+        // Items
+        msg += `*Order Items:*\n`;
+        items.forEach((item, i) => {
+            msg += `${i + 1}. *${item.name}*\n`;
+            msg += `   Qty: ${item.quantity} × ${formatPrice(item.price)} = ${formatPrice(item.price * item.quantity)}\n`;
+            if (item.id) {
+                msg += `   🔗 ${window.location.origin}/product.html?id=${item.id}\n`;
             }
-
-            // Step 1: Create order via Cloud Function (server-verified amount)
-            const createResponse = await fetch(functionsUrl.createOrder, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    items: cartItems.map(item => ({
-                        productId: item.id,
-                        quantity: item.quantity
-                    })),
-                    customer: {
-                        name: formData.name.trim(),
-                        email: formData.email.trim().toLowerCase(),
-                        phone: formData.phone.replace(/[\s-]/g, '')
-                    },
-                    shippingAddress: {
-                        address: formData.address.trim(),
-                        city: formData.city.trim(),
-                        state: formData.state.trim(),
-                        pincode: formData.pincode.trim()
-                    },
-                    notes: formData.notes.trim()
-                })
-            });
-
-            const orderResult = await createResponse.json();
-
-            if (!createResponse.ok) {
-                throw new Error(orderResult.error || 'Failed to create order');
-            }
-
-            // Step 2: Open Razorpay with server-created order
-            setPayBtnState(true, 'Opening payment...');
-            openRazorpay(orderResult, formData);
-
-        } catch (error) {
-            console.error('Payment error:', error);
-            PremamCart.showToast(error.message || 'Something went wrong. Please try again.', 'error');
-            setPayBtnState(false);
-            isProcessing = false;
-        }
-    }
-
-    function openRazorpay(orderResult, formData) {
-        const config = window.PremamDB?.RAZORPAY_CONFIG || {
-            keyId: 'YOUR_RAZORPAY_KEY_ID',
-            businessName: 'Premam Silks',
-            theme: { color: '#0d6157' }
-        };
-
-        const options = {
-            key: config.keyId,
-            amount: orderResult.amount * 100,
-            currency: orderResult.currency,
-            name: config.businessName,
-            description: `Order #${orderResult.orderId}`,
-            image: config.businessLogo || '',
-            order_id: orderResult.razorpayOrderId,
-            prefill: {
-                name: formData.name,
-                email: formData.email,
-                contact: formData.phone
-            },
-            theme: {
-                color: config.theme?.color || '#0d6157'
-            },
-            config: {
-                display: {
-                    blocks: {
-                        upi: {
-                            name: "Pay via UPI",
-                            instruments: [
-                                { method: "upi", flows: ["qr", "collect", "intent"] }
-                            ]
-                        },
-                        card: {
-                            name: "Pay via Card",
-                            instruments: [
-                                { method: "card" }
-                            ]
-                        },
-                        netbanking: {
-                            name: "Pay via Netbanking",
-                            instruments: [
-                                { method: "netbanking" }
-                            ]
-                        },
-                        wallet: {
-                            name: "Pay via Wallet",
-                            instruments: [
-                                { method: "wallet" }
-                            ]
-                        }
-                    },
-                    sequence: ["block.upi", "block.card", "block.netbanking", "block.wallet"],
-                    preferences: {
-                        show_default_blocks: false
-                    }
-                }
-            },
-            method: {
-                upi: true,
-                card: true,
-                netbanking: true,
-                wallet: true,
-                emi: false,
-                paylater: false
-            },
-            handler: async function (response) {
-                await handlePaymentSuccess(orderResult.orderId, response);
-            },
-            modal: {
-                ondismiss: function () {
-                    setPayBtnState(false);
-                    isProcessing = false;
-                    PremamCart.showToast('Payment cancelled', 'info');
-                }
-            }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (response) {
-            handlePaymentFailure(response);
+            msg += `\n`;
         });
-        rzp.open();
-    }
 
-    async function handlePaymentSuccess(orderId, razorpayResponse) {
-        setPayBtnState(true, 'Verifying payment...');
+        // Totals
+        msg += `━━━━━━━━━━━━━━━━━━\n`;
+        msg += `*Subtotal:* ${formatPrice(totals.subtotal)}\n`;
+        msg += `*Shipping:* ${totals.freeShipping ? 'FREE ✅' : formatPrice(totals.shipping)}\n`;
+        if (totals.gst > 0) msg += `*GST (${window.PremamDB?.APP_CONFIG?.gst || 0}%):* ${formatPrice(totals.gst)}\n`;
+        msg += `*Total: ${formatPrice(totals.total)}*\n`;
+        msg += `━━━━━━━━━━━━━━━━━━\n\n`;
 
-        try {
-            const functionsUrl = window.PremamDB?.CloudFunctions;
+        // Customer details
+        msg += `*Customer Details:*\n`;
+        msg += `👤 ${formData.name.trim()}\n`;
+        msg += `📧 ${formData.email.trim()}\n`;
+        msg += `📞 ${formData.phone.trim()}\n\n`;
 
-            // Step 3: Verify payment signature server-side
-            const verifyResponse = await fetch(functionsUrl.verifyPayment, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderId,
-                    razorpayOrderId: razorpayResponse.razorpay_order_id,
-                    razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-                    razorpaySignature: razorpayResponse.razorpay_signature
-                })
-            });
+        // Shipping address
+        msg += `*Shipping Address:*\n`;
+        msg += `📍 ${formData.address.trim()}\n`;
+        msg += `${formData.city.trim()}, ${formData.state.trim()} - ${formData.pincode.trim()}\n`;
 
-            const verifyResult = await verifyResponse.json();
-
-            if (!verifyResponse.ok) {
-                throw new Error(verifyResult.error || 'Payment verification failed');
-            }
-
-            // Store only order ID (not sensitive data)
-            localStorage.setItem('premam_last_order', JSON.stringify({ orderId }));
-
-            // Clear cart
-            PremamCart.clear();
-
-            // Redirect to confirmation
-            window.location.href = `order-confirmation.html?id=${orderId}`;
-
-        } catch (error) {
-            console.error('Payment verification error:', error);
-            // Payment was likely successful — still redirect with a note
-            localStorage.setItem('premam_last_order', JSON.stringify({ orderId }));
-            PremamCart.clear();
-            window.location.href = `order-confirmation.html?id=${orderId}`;
+        // Notes
+        if (formData.notes.trim()) {
+            msg += `\n📝 *Notes:* ${formData.notes.trim()}\n`;
         }
-    }
 
-    function handlePaymentFailure(response) {
-        console.error('Payment failed:', response.error?.code);
-        PremamCart.showToast('Payment failed. Please try again or use a different payment method.', 'error');
-        setPayBtnState(false);
-        isProcessing = false;
+        msg += `\n━━━━━━━━━━━━━━━━━━\n`;
+        msg += `_Sent from premamsilks.com_`;
+
+        // Open WhatsApp
+        const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+
+        // Clear cart after sending
+        PremamCart.clear();
+
+        // Show success message
+        PremamCart.showToast('Order sent to WhatsApp! Our team will contact you shortly.', 'success');
+
+        // Redirect to a thank you state after a short delay
+        setTimeout(() => {
+            document.querySelector('.checkout-form-section').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" width="80" height="80" style="margin-bottom: 20px;">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654z"/>
+                    </svg>
+                    <h2 style="color: #166534; margin-bottom: 12px;">Order Sent Successfully!</h2>
+                    <p style="color: #4b5563; font-size: 1.05rem; line-height: 1.6; max-width: 450px; margin: 0 auto 24px;">
+                        Your order details have been sent to our WhatsApp. Our team will reach out to you shortly to confirm the order and arrange payment.
+                    </p>
+                    <a href="shop.html" class="btn btn-primary" style="display: inline-block; padding: 12px 32px; border-radius: 8px; text-decoration: none;">Continue Shopping</a>
+                </div>
+            `;
+        }, 1500);
     }
 
     // ============================================================
@@ -326,65 +201,65 @@ const PremamCheckout = (function () {
 
         if (items.length === 0) {
             container.innerHTML = `
-        <div class="checkout-empty">
-          <p>Your cart is empty</p>
-          <a href="shop.html" class="btn btn-primary">Browse Sarees</a>
-        </div>
-      `;
+                <div class="checkout-empty">
+                    <p>Your cart is empty</p>
+                    <a href="shop.html" class="btn btn-primary">Browse Sarees</a>
+                </div>
+            `;
             return;
         }
 
         container.innerHTML = `
-      <div class="order-items">
-        ${items.map(item => `
-          <div class="order-item">
-            <div class="order-item-img">
-              <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}">
-              <span class="order-item-qty-badge">${item.quantity}</span>
+            <div class="order-items">
+                ${items.map(item => `
+                    <div class="order-item">
+                        <div class="order-item-img">
+                            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}">
+                            <span class="order-item-qty-badge">${item.quantity}</span>
+                        </div>
+                        <div class="order-item-info">
+                            <span class="order-item-category">${escapeHTML(item.category || '')}</span>
+                            <h4>${escapeHTML(item.name)}</h4>
+                        </div>
+                        <div class="order-item-price">${formatPrice(item.price * item.quantity)}</div>
+                    </div>
+                `).join('')}
             </div>
-            <div class="order-item-info">
-              <span class="order-item-category">${escapeHTML(item.category || '')}</span>
-              <h4>${escapeHTML(item.name)}</h4>
+
+            <div class="order-totals">
+                <div class="order-total-row">
+                    <span>Subtotal (${PremamCart.getCount()} items)</span>
+                    <span>${formatPrice(totals.subtotal)}</span>
+                </div>
+                <div class="order-total-row">
+                    <span>Shipping</span>
+                    <span>${totals.freeShipping ? '<span class="free-tag">FREE</span>' : formatPrice(totals.shipping)}</span>
+                </div>
+                ${totals.gst > 0 ? `<div class="order-total-row">
+                    <span>GST (${window.PremamDB?.APP_CONFIG?.gst || 0}%)</span>
+                    <span>${formatPrice(totals.gst)}</span>
+                </div>` : ''}
+                <div class="order-total-row total">
+                    <span>Total</span>
+                    <span>${formatPrice(totals.total)}</span>
+                </div>
             </div>
-            <div class="order-item-price">${PremamCart.formatPrice(item.price * item.quantity)}</div>
-          </div>
-        `).join('')}
-      </div>
 
-      <div class="order-totals">
-        <div class="order-total-row">
-          <span>Subtotal (${PremamCart.getCount()} items)</span>
-          <span>${PremamCart.formatPrice(totals.subtotal)}</span>
-        </div>
-        <div class="order-total-row">
-          <span>Shipping</span>
-          <span>${totals.freeShipping ? '<span class="free-tag">FREE</span>' : PremamCart.formatPrice(totals.shipping)}</span>
-        </div>
-        <div class="order-total-row">
-          <span>GST (5%)</span>
-          <span>${PremamCart.formatPrice(totals.gst)}</span>
-        </div>
-        <div class="order-total-row total">
-          <span>Total</span>
-          <span>${PremamCart.formatPrice(totals.total)}</span>
-        </div>
-      </div>
-
-      <div class="order-trust">
-        <div class="trust-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span>Secure Checkout</span>
-        </div>
-        <div class="trust-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          <span>100% Authentic</span>
-        </div>
-      </div>
-    `;
+            <div class="order-trust">
+                <div class="trust-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span>100% Authentic</span>
+                </div>
+                <div class="trust-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <span>Free Shipping Above ₹25,000</span>
+                </div>
+            </div>
+        `;
     }
 
     // ============================================================
@@ -398,7 +273,7 @@ const PremamCheckout = (function () {
         if (payBtn) {
             payBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                processPayment();
+                processOrder();
             });
         }
 
@@ -426,7 +301,7 @@ const PremamCheckout = (function () {
     }
 
     return {
-        processPayment,
+        processOrder,
         renderOrderSummary,
         validateForm
     };

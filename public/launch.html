@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premam Silks — Grand Launch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(13, 97, 87, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(212, 168, 83, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(13, 97, 87, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(212, 168, 83, 0.3);
+            border-radius: 50%;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Logo */
+        .launch-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        .launch-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(212, 168, 83, 0.4));
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(212, 168, 83, 0.3)); }
+            50% { filter: drop-shadow(0 0 30px rgba(212, 168, 83, 0.6)); }
+        }
+
+        /* Brand */
+        .brand-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            color: #d4a853;
+            text-shadow: 0 0 40px rgba(212, 168, 83, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .brand-tagline {
+            font-size: 0.95rem;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        /* Countdown */
+        .countdown-label {
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .countdown-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 168, 83, 0.2);
+            border-radius: 12px;
+            padding: 12px 8px;
+            transition: all 0.3s;
+        }
+
+        .countdown-unit {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 8px;
+        }
+
+        .countdown-sep {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            color: rgba(212, 168, 83, 0.5);
+            align-self: flex-start;
+            padding-top: 16px;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Launch Button */
+        .launch-btn-wrapper {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        .launch-btn-wrapper.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .launch-btn {
+            position: relative;
+            background: linear-gradient(135deg, #d4a853 0%, #b8860b 50%, #d4a853 100%);
+            background-size: 200% 200%;
+            animation: shimmer 3s ease-in-out infinite;
+            color: #0a0a0a;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            padding: 22px 64px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow:
+                0 0 30px rgba(212, 168, 83, 0.3),
+                0 0 60px rgba(212, 168, 83, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .launch-btn:hover {
+            transform: scale(1.05);
+            box-shadow:
+                0 0 50px rgba(212, 168, 83, 0.5),
+                0 0 100px rgba(212, 168, 83, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .launch-btn:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .launch-hint {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.1em;
+        }
+
+        /* Confetti Canvas */
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Post-launch screen */
+        .launched-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .launched-screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .launched-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #d4a853;
+            margin-bottom: 16px;
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .launched-sub {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+            animation: fadeIn 0.8s ease 0.3s both;
+        }
+
+        .launched-redirect {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: fadeIn 0.8s ease 0.6s both;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .brand-name { font-size: 2.2rem; letter-spacing: 0.15em; }
+            .countdown-num { font-size: 2.5rem; min-width: 56px; padding: 10px 6px; }
+            .countdown { gap: 12px; }
+            .countdown-sep { font-size: 2rem; padding-top: 12px; }
+            .launch-btn { font-size: 1rem; padding: 18px 44px; }
+            .launch-logo { width: 90px; height: 90px; }
+            .launched-text { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="particles" id="particles"></div>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <div class="content">
+        <div class="launch-logo">
+            <img src="images/logo.png" alt="Premam Silks">
+        </div>
+        <h1 class="brand-name">PREMAM SILKS</h1>
+        <p class="brand-tagline">Timeless Sarees &bull; Endless Love</p>
+
+        <p class="countdown-label">Launching In</p>
+        <div class="countdown" id="countdown">
+            <div class="countdown-item">
+                <div class="countdown-num" id="hours">00</div>
+                <span class="countdown-unit">Hours</span>
+            </div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-item">
+                <div class="countdown-num" id="minutes">00</div>
+                <span class="countdown-unit">Minutes</span>
+            </div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-item">
+                <div class="countdown-num" id="seconds">00</div>
+                <span class="countdown-unit">Seconds</span>
+            </div>
+        </div>
+
+        <div class="launch-btn-wrapper" id="launchWrapper">
+            <button class="launch-btn" id="launchBtn">LAUNCH</button>
+            <p class="launch-hint">Click to go live</p>
+        </div>
+    </div>
+
+    <!-- Post-launch screen -->
+    <div class="launched-screen" id="launchedScreen">
+        <div class="launch-logo" style="margin-bottom: 30px;">
+            <img src="images/logo.png" alt="Premam Silks">
+        </div>
+        <h1 class="launched-text">We Are Live!</h1>
+        <p class="launched-sub">Premam Silks is now open for the world</p>
+        <p class="launched-redirect">Redirecting to the store...</p>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ====== FLOATING PARTICLES ======
+        var particlesEl = document.getElementById('particles');
+        for (var i = 0; i < 40; i++) {
+            var p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (6 + Math.random() * 10) + 's';
+            p.style.animationDelay = (Math.random() * 8) + 's';
+            p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+            particlesEl.appendChild(p);
+        }
+
+        // ====== COUNTDOWN ======
+        // Launch: 10 seconds from when page is opened
+        var launchTime = Date.now() + (10 * 1000);
+
+        var hoursEl = document.getElementById('hours');
+        var minutesEl = document.getElementById('minutes');
+        var secondsEl = document.getElementById('seconds');
+        var launchWrapper = document.getElementById('launchWrapper');
+        var countdownEl = document.getElementById('countdown');
+        var countdownLabel = document.querySelector('.countdown-label');
+        var launched = false;
+
+        function pad(n) { return n < 10 ? '0' + n : n; }
+
+        function updateCountdown() {
+            var now = Date.now();
+            var diff = launchTime - now;
+
+            if (diff <= 0) {
+                // Countdown done — show launch button
+                hoursEl.textContent = '00';
+                minutesEl.textContent = '00';
+                secondsEl.textContent = '00';
+                countdownLabel.textContent = "It's Time!";
+                launchWrapper.classList.add('visible');
+                return;
+            }
+
+            var h = Math.floor(diff / (1000 * 60 * 60));
+            var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            hoursEl.textContent = pad(h);
+            minutesEl.textContent = pad(m);
+            secondsEl.textContent = pad(s);
+
+            requestAnimationFrame(updateCountdown);
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // ====== CONFETTI ======
+        var canvas = document.getElementById('confettiCanvas');
+        var ctx = canvas.getContext('2d');
+        var confetti = [];
+        var confettiColors = ['#d4a853', '#0d6157', '#fff', '#b8860b', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf'];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function createConfetti() {
+            for (var i = 0; i < 300; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: -20 - Math.random() * canvas.height,
+                    w: 6 + Math.random() * 8,
+                    h: 4 + Math.random() * 5,
+                    color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: 2 + Math.random() * 4,
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 10,
+                    opacity: 1
+                });
+            }
+        }
+
+        var confettiRunning = false;
+        function animateConfetti() {
+            if (!confettiRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            var alive = false;
+            for (var i = 0; i < confetti.length; i++) {
+                var c = confetti[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                c.vy += 0.05;
+                c.rotation += c.rotSpeed;
+                if (c.y > canvas.height + 20) {
+                    c.opacity -= 0.02;
+                }
+                if (c.opacity <= 0) continue;
+                alive = true;
+
+                ctx.save();
+                ctx.globalAlpha = c.opacity;
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation * Math.PI / 180);
+                ctx.fillStyle = c.color;
+                ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                ctx.restore();
+            }
+
+            if (alive) {
+                requestAnimationFrame(animateConfetti);
+            } else {
+                confettiRunning = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function fireConfetti() {
+            confetti = [];
+            createConfetti();
+            confettiRunning = true;
+            animateConfetti();
+
+            // Fire more rounds
+            setTimeout(function () { createConfetti(); }, 400);
+            setTimeout(function () { createConfetti(); }, 800);
+        }
+
+        // ====== LAUNCH BUTTON ======
+        document.getElementById('launchBtn').addEventListener('click', function () {
+            if (launched) return;
+            launched = true;
+
+            // Fire confetti
+            fireConfetti();
+
+            // Show launched screen after a moment
+            setTimeout(function () {
+                document.getElementById('launchedScreen').classList.add('active');
+                // More confetti on the launched screen
+                setTimeout(fireConfetti, 300);
+            }, 1500);
+
+            // Redirect to live site
+            setTimeout(function () {
+                window.location.href = 'index.html';
+            }, 5000);
+        });
+
+    })();
+    </script>
+</body>
+</html>

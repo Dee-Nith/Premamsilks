@@ -55,7 +55,7 @@ const APP_CONFIG = {
     currencyCode: "INR",
     freeShippingThreshold: 25000,
     shippingCost: 500,
-    gst: 5,                     // GST percentage
+    gst: 0,                     // GST percentage (set to 0 until GST registration)
     whatsappNumber: "917200123457",
     contactEmail: "premamsilks@gmail.com",
     contactPhone: "+91 7200123457"

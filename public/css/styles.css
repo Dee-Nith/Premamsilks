@@ -557,8 +557,10 @@ h6 {
 /* ===== Collections Grid ===== */
 .collections-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-6);
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .collection-card {
@@ -815,7 +817,6 @@ h6 {
 
 .footer-brand .logo img {
     height: 50px;
-    filter: brightness(0) invert(1);
 }
 
 .footer-brand p {

@@ -353,10 +353,10 @@ const PremamCart = (function () {
           <span>Shipping</span>
           <span>${totals.freeShipping ? '<span class="free-shipping">FREE</span>' : formatPrice(totals.shipping)}</span>
         </div>
-        <div class="cart-summary-row">
-          <span>GST (${window.PremamDB?.APP_CONFIG?.gst || 5}%)</span>
+        ${totals.gst > 0 ? `<div class="cart-summary-row">
+          <span>GST (${window.PremamDB?.APP_CONFIG?.gst || 0}%)</span>
           <span>${formatPrice(totals.gst)}</span>
-        </div>
+        </div>` : ''}
         ${!totals.freeShipping ? `
           <div class="cart-free-shipping-msg">
             Add ${formatPrice((window.PremamDB?.APP_CONFIG?.freeShippingThreshold || 25000) - totals.subtotal)} more for free shipping!
