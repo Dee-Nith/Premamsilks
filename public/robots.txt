@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout.html
+Disallow: /order-confirmation.html
+
+Sitemap: https://premamsilks.com/sitemap.xml

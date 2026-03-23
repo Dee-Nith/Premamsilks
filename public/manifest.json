@@ -1,0 +1,21 @@
+{
+  "name": "Premam Silks",
+  "short_name": "Premam Silks",
+  "description": "Exquisite handwoven silk sarees. Timeless Kanjivaram, Banarasi, and contemporary designs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6157",
+  "icons": [
+    {
+      "src": "/images/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

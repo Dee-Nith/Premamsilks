@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CQ5DZVP8MZ"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-CQ5DZVP8MZ");</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Premam Silks</title>
@@ -82,6 +85,14 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                     <span>Orders</span>
+                </a>
+                <a href="#" class="sidebar-link" data-tab="coupons">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span>Coupons</span>
                 </a>
                 <a href="#" class="sidebar-link" data-tab="settings">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
@@ -195,6 +206,84 @@
                                 <span class="metric-value" id="totalCustomers">0</span>
                                 <span class="metric-change positive">↑ 0 new</span>
                             </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon" style="background: #e0f2fe; color: #0284c7;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Page Views (7d)</span>
+                                <span class="metric-value" id="totalPageViews">0</span>
+                                <span class="metric-change neutral" id="todayPageViews">0 today</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-grid">
+                        <div class="admin-card chart-card">
+                            <div class="card-header">
+                                <h3>Revenue Over Time</h3>
+                                <div class="chart-period-toggle">
+                                    <button class="period-btn active" data-period="7d" data-chart="revenue">7D</button>
+                                    <button class="period-btn" data-period="30d" data-chart="revenue">30D</button>
+                                    <button class="period-btn" data-period="90d" data-chart="revenue">90D</button>
+                                </div>
+                            </div>
+                            <div class="chart-body"><canvas id="revenueChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card">
+                            <div class="card-header"><h3>Order Status</h3></div>
+                            <div class="chart-body chart-body-sm"><canvas id="orderStatusChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card">
+                            <div class="card-header"><h3>Top Products by Revenue</h3></div>
+                            <div class="chart-body"><canvas id="topProductsChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card">
+                            <div class="card-header"><h3>Products by Category</h3></div>
+                            <div class="chart-body chart-body-sm"><canvas id="categoryChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card chart-card-full">
+                            <div class="card-header">
+                                <h3>Website Visitors</h3>
+                                <div class="chart-period-toggle">
+                                    <button class="period-btn active" data-period="7d" data-chart="visitors">7D</button>
+                                    <button class="period-btn" data-period="30d" data-chart="visitors">30D</button>
+                                    <button class="period-btn" data-period="90d" data-chart="visitors">90D</button>
+                                </div>
+                            </div>
+                            <div class="chart-body"><canvas id="visitorsChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card chart-card-full">
+                            <div class="card-header">
+                                <h3>Popular Pages</h3>
+                            </div>
+                            <div class="chart-body"><canvas id="popularPagesChart"></canvas></div>
+                        </div>
+
+                        <div class="admin-card chart-card chart-card-full">
+                            <div class="card-header">
+                                <h3>Sales Trend</h3>
+                                <div class="chart-period-toggle">
+                                    <button class="period-btn active" data-period="7d" data-chart="sales">7D</button>
+                                    <button class="period-btn" data-period="30d" data-chart="sales">30D</button>
+                                    <button class="period-btn" data-period="90d" data-chart="sales">90D</button>
+                                </div>
+                            </div>
+                            <div class="chart-body"><canvas id="salesTrendChart"></canvas></div>
                         </div>
                     </div>
 
@@ -335,6 +424,108 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ===== COUPONS TAB ===== -->
+                <div class="tab-content" id="tab-coupons">
+                    <div class="tab-toolbar">
+                        <div class="toolbar-left">
+                            <input type="text" class="search-input" id="couponSearch" placeholder="Search coupons...">
+                        </div>
+                        <button class="btn-primary" id="addCouponBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Coupon
+                        </button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="table-responsive">
+                            <table class="admin-table" id="couponsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                        <th>Uses</th>
+                                        <th>Min Order</th>
+                                        <th>Expiry</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="couponsTableBody">
+                                    <tr>
+                                        <td colspan="8" style="text-align:center;padding:40px;color:var(--admin-text-muted);">Loading coupons...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coupon Modal -->
+                <div class="modal-overlay" id="couponModalOverlay">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h2 id="couponModalTitle">Add Coupon</h2>
+                            <button class="modal-close" id="couponModalClose">&times;</button>
+                        </div>
+                        <form class="modal-form" id="couponForm">
+                            <input type="hidden" id="couponId">
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label>Coupon Code *</label>
+                                    <input type="text" id="couponCode" required placeholder="e.g. WELCOME10" style="text-transform:uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select id="couponActive">
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label>Discount Type *</label>
+                                    <select id="couponType" required>
+                                        <option value="fixed">Fixed Amount (₹)</option>
+                                        <option value="percentage">Percentage (%)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Discount Value *</label>
+                                    <input type="number" id="couponValue" required min="1" placeholder="e.g. 500 or 10">
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label>Min Order Value (₹)</label>
+                                    <input type="number" id="couponMinOrder" min="0" value="0" placeholder="0 = no minimum">
+                                </div>
+                                <div class="form-group">
+                                    <label>Max Discount (₹) <small style="color:var(--admin-text-muted);">for % type</small></label>
+                                    <input type="number" id="couponMaxDiscount" min="0" value="0" placeholder="0 = no cap">
+                                </div>
+                            </div>
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label>Max Uses</label>
+                                    <input type="number" id="couponMaxUses" min="0" value="0" placeholder="0 = unlimited">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="date" id="couponExpiry">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="couponCancelBtn">Cancel</button>
+                                <button type="submit" class="btn-primary" id="couponSaveBtn">Save Coupon</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -555,8 +746,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="../js/firebase-config.js"></script>
-    <script src="admin.js?v=2.0"></script>
+    <script src="admin.js?v=3.1"></script>
 </body>
 
 </html>

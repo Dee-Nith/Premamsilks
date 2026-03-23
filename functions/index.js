@@ -266,7 +266,7 @@ exports.submitContact = functions
 
           await transporter.sendMail({
             from: `"Premam Silks Website" <${process.env.GMAIL_USER}>`,
-            to: process.env.GMAIL_USER,
+            to: "premamsilks@gmail.com",
             replyTo: contactData.email,
             subject: `New Contact: ${contactData.subject} — from ${contactData.name}`,
             html: `

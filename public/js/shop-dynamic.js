@@ -110,7 +110,7 @@
             <div class="product-info">
                 <a href="${productLink}" style="text-decoration:none;color:inherit;"><span class="product-category">${escapeHTML(p.category || 'Saree')}</span></a>
                 <a href="${productLink}" style="text-decoration:none;color:inherit;"><h4 class="product-name">${escapeHTML(p.name || 'Untitled')}</h4></a>
-                ${p.sareeCode ? `<small style="color:#8a7e6b;font-size:0.7rem;">${p.sareeCode}</small>` : ''}
+                ${p.sareeCode ? `<small class="product-code" style="color:#8a7e6b;font-size:0.7rem;">${p.sareeCode}</small>` : ''}
                 <div class="product-price">
                     <span class="current">${formatPrice(p.price || 0)}</span>
                     ${originalPriceHTML}
@@ -328,7 +328,7 @@
 
         // Filter toggle (mobile)
         filterToggle?.addEventListener('click', () => {
-            filterSidebar?.classList.toggle('open');
+            filterSidebar?.classList.toggle('active');
         });
 
         // Load more

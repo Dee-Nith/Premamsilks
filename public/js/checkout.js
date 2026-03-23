@@ -13,6 +13,9 @@ const PremamCheckout = (function () {
 
     const WHATSAPP_NUMBER = '917200123457';
 
+    // Coupon state
+    let appliedCoupon = null; // { code, discountType, discountValue, discountAmount, couponId }
+
     // ============================================================
     // FORM VALIDATION
     // ============================================================
@@ -92,6 +95,102 @@ const PremamCheckout = (function () {
     }
 
     // ============================================================
+    // COUPON LOGIC
+    // ============================================================
+
+    async function applyCoupon() {
+        const input = document.getElementById('couponInput');
+        const msgEl = document.getElementById('couponMessage');
+        if (!input || !msgEl) return;
+
+        const code = input.value.trim().toUpperCase();
+        if (!code) {
+            showCouponMessage(msgEl, 'Please enter a coupon code', 'error');
+            return;
+        }
+
+        if (!window.PremamDB || !db) {
+            showCouponMessage(msgEl, 'Unable to verify coupon. Please try again.', 'error');
+            return;
+        }
+
+        try {
+            const snap = await db.collection('coupons').where('code', '==', code).get();
+            if (snap.empty) {
+                showCouponMessage(msgEl, 'Invalid coupon code', 'error');
+                return;
+            }
+
+            const doc = snap.docs[0];
+            const coupon = { id: doc.id, ...doc.data() };
+
+            // Validate coupon
+            if (!coupon.isActive) {
+                showCouponMessage(msgEl, 'This coupon is no longer active', 'error');
+                return;
+            }
+            if (coupon.expiryDate && coupon.expiryDate.toDate() < new Date()) {
+                showCouponMessage(msgEl, 'This coupon has expired', 'error');
+                return;
+            }
+            if (coupon.maxUses > 0 && (coupon.currentUses || 0) >= coupon.maxUses) {
+                showCouponMessage(msgEl, 'This coupon has reached its usage limit', 'error');
+                return;
+            }
+
+            const totals = PremamCart.getTotal();
+            if (coupon.minOrderValue > 0 && totals.subtotal < coupon.minOrderValue) {
+                showCouponMessage(msgEl, `Minimum order of ${formatPrice(coupon.minOrderValue)} required`, 'error');
+                return;
+            }
+
+            // Calculate discount
+            let discountAmount = 0;
+            if (coupon.discountType === 'percentage') {
+                discountAmount = Math.round(totals.subtotal * coupon.discountValue / 100);
+                if (coupon.maxDiscount > 0 && discountAmount > coupon.maxDiscount) {
+                    discountAmount = coupon.maxDiscount;
+                }
+            } else {
+                discountAmount = coupon.discountValue;
+            }
+
+            // Don't let discount exceed subtotal
+            if (discountAmount > totals.subtotal) {
+                discountAmount = totals.subtotal;
+            }
+
+            appliedCoupon = {
+                code: coupon.code,
+                discountType: coupon.discountType,
+                discountValue: coupon.discountValue,
+                discountAmount,
+                couponId: coupon.id
+            };
+
+            showCouponMessage(msgEl, `Coupon applied! You save ${formatPrice(discountAmount)}`, 'success');
+            renderOrderSummary();
+        } catch (error) {
+            console.error('Coupon error:', error);
+            showCouponMessage(msgEl, 'Error verifying coupon. Please try again.', 'error');
+        }
+    }
+
+    function removeCoupon() {
+        appliedCoupon = null;
+        const input = document.getElementById('couponInput');
+        const msgEl = document.getElementById('couponMessage');
+        if (input) input.value = '';
+        if (msgEl) { msgEl.textContent = ''; msgEl.className = 'coupon-message'; }
+        renderOrderSummary();
+    }
+
+    function showCouponMessage(el, msg, type) {
+        el.textContent = msg;
+        el.className = `coupon-message coupon-${type}`;
+    }
+
+    // ============================================================
     // WHATSAPP ORDER FLOW
     // ============================================================
 
@@ -137,9 +236,13 @@ const PremamCheckout = (function () {
         // Totals
         msg += `━━━━━━━━━━━━━━━━━━\n`;
         msg += `*Subtotal:* ${formatPrice(totals.subtotal)}\n`;
+        if (appliedCoupon) {
+            msg += `*Coupon (${appliedCoupon.code}):* -${formatPrice(appliedCoupon.discountAmount)} 🎉\n`;
+        }
         msg += `*Shipping:* ${totals.freeShipping ? 'FREE ✅' : formatPrice(totals.shipping)}\n`;
         if (totals.gst > 0) msg += `*GST (${window.PremamDB?.APP_CONFIG?.gst || 0}%):* ${formatPrice(totals.gst)}\n`;
-        msg += `*Total: ${formatPrice(totals.total)}*\n`;
+        const finalTotal = totals.total - (appliedCoupon ? appliedCoupon.discountAmount : 0);
+        msg += `*Total: ${formatPrice(finalTotal)}*\n`;
         msg += `━━━━━━━━━━━━━━━━━━\n\n`;
 
         // Customer details
@@ -164,6 +267,16 @@ const PremamCheckout = (function () {
         // Open WhatsApp
         const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
         window.open(waUrl, '_blank');
+
+        // Increment coupon usage
+        if (appliedCoupon && db) {
+            try {
+                db.collection('coupons').doc(appliedCoupon.couponId).update({
+                    currentUses: firebase.firestore.FieldValue.increment(1)
+                });
+            } catch (e) { console.warn('Could not increment coupon usage:', e); }
+            appliedCoupon = null;
+        }
 
         // Clear cart after sending
         PremamCart.clear();
@@ -226,11 +339,29 @@ const PremamCheckout = (function () {
                 `).join('')}
             </div>
 
+            <div class="coupon-section">
+                <label class="coupon-label">Have a coupon code?</label>
+                <div class="coupon-input-row">
+                    <input type="text" id="couponInput" class="coupon-input" placeholder="Enter code" value="${appliedCoupon ? appliedCoupon.code : ''}" ${appliedCoupon ? 'readonly' : ''}>
+                    ${appliedCoupon
+                        ? '<button type="button" class="coupon-btn coupon-remove-btn" onclick="PremamCheckout.removeCoupon()">Remove</button>'
+                        : '<button type="button" class="coupon-btn coupon-apply-btn" onclick="PremamCheckout.applyCoupon()">Apply</button>'
+                    }
+                </div>
+                <div id="couponMessage" class="coupon-message ${appliedCoupon ? 'coupon-success' : ''}">
+                    ${appliedCoupon ? `Coupon applied! You save ${formatPrice(appliedCoupon.discountAmount)}` : ''}
+                </div>
+            </div>
+
             <div class="order-totals">
                 <div class="order-total-row">
                     <span>Subtotal (${PremamCart.getCount()} items)</span>
                     <span>${formatPrice(totals.subtotal)}</span>
                 </div>
+                ${appliedCoupon ? `<div class="order-total-row discount-row">
+                    <span>Discount (${appliedCoupon.code})</span>
+                    <span>-${formatPrice(appliedCoupon.discountAmount)}</span>
+                </div>` : ''}
                 <div class="order-total-row">
                     <span>Shipping</span>
                     <span>${totals.freeShipping ? '<span class="free-tag">FREE</span>' : formatPrice(totals.shipping)}</span>
@@ -241,7 +372,7 @@ const PremamCheckout = (function () {
                 </div>` : ''}
                 <div class="order-total-row total">
                     <span>Total</span>
-                    <span>${formatPrice(totals.total)}</span>
+                    <span>${formatPrice(totals.total - (appliedCoupon ? appliedCoupon.discountAmount : 0))}</span>
                 </div>
             </div>
 
@@ -303,7 +434,9 @@ const PremamCheckout = (function () {
     return {
         processOrder,
         renderOrderSummary,
-        validateForm
+        validateForm,
+        applyCoupon,
+        removeCoupon
     };
 
 })();

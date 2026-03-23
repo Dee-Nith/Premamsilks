@@ -41,7 +41,10 @@ service-account.json
 functions/.env
 
 # Loose images / screenshots in root
-*.png
-*.jpg
-*.jpeg
-Screenshot*
+/*.png
+/*.jpg
+/*.jpeg
+/Screenshot*
+
+# Allow screenshots folder
+!screenshots/

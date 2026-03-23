@@ -55,6 +55,18 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // ─── COUPONS ────────────────────────────────────────
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── PAGE VIEWS (Analytics) ─────────────────────────
+    match /pageViews/{dateId} {
+      allow read: if isAdmin();
+      allow write: if true;  // Public pages write view counts
+    }
+
     // ─── NEWSLETTER ──────────────────────────────────────
     // Public can create (via Cloud Function), only admin reads
     match /newsletter/{subId} {

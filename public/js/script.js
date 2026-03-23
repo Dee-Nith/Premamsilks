@@ -416,12 +416,209 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ===== Search Modal (Placeholder) =====
+  // ===== Search Modal =====
   const searchBtn = document.getElementById('searchBtn');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchModal = document.getElementById('searchModal');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const searchClose = document.getElementById('searchClose');
+
+  let cachedProducts = null;
+  let searchTimeout = null;
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+  }
+
+  function openSearch() {
+    if (!searchOverlay || !searchModal) return;
+    searchOverlay.classList.add('active');
+    searchModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+    if (searchResults) {
+      searchResults.innerHTML = '<p class="search-hint">Search by product name, saree code, or category</p>';
+    }
+  }
+
+  function closeSearch() {
+    if (!searchOverlay || !searchModal) return;
+    searchOverlay.classList.remove('active');
+    searchModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  async function loadProducts() {
+    if (cachedProducts) return cachedProducts;
+    if (typeof getProducts === 'function') {
+      cachedProducts = await getProducts();
+      return cachedProducts;
+    }
+    return [];
+  }
+
+  function formatPrice(price) {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
+  }
+
+  async function handleSearch(query) {
+    if (!searchResults) return;
+    query = query.trim().toLowerCase();
+
+    if (!query) {
+      searchResults.innerHTML = '<p class="search-hint">Search by product name, saree code, or category</p>';
+      return;
+    }
+
+    if (query.length < 2) return;
+
+    searchResults.innerHTML = '<p class="search-hint">Searching...</p>';
+
+    const products = await loadProducts();
+    const matches = products.filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const code = (p.sareeCode || '').toLowerCase();
+      const category = (p.category || '').toLowerCase();
+      const color = (p.color || '').toLowerCase();
+      return name.includes(query) || code.includes(query) || category.includes(query) || color.includes(query);
+    }).slice(0, 10);
+
+    if (matches.length === 0) {
+      searchResults.innerHTML = '<p class="search-no-results">No products found. Try a different search term.</p>';
+      return;
+    }
+
+    searchResults.innerHTML = matches.map(p => {
+      const img = (p.images && p.images[0]) || p.image || 'images/placeholder.png';
+      return `<a href="product.html?id=${escapeHTML(p.id)}" class="search-result-item">
+        <img src="${escapeHTML(img)}" alt="${escapeHTML(p.name)}" class="search-result-img" onerror="this.src='images/placeholder.png'">
+        <div class="search-result-info">
+          ${p.sareeCode ? `<span class="search-result-code">${escapeHTML(p.sareeCode)}</span>` : ''}
+          <div class="search-result-name">${escapeHTML(p.name)}</div>
+          <span class="search-result-price">${formatPrice(p.price)}</span>
+        </div>
+      </a>`;
+    }).join('');
+  }
+
   if (searchBtn) {
-    searchBtn.addEventListener('click', function () {
-      // In a full implementation, this would open a search modal
-      alert('Search functionality coming soon! For now, browse our collections or contact us on WhatsApp.');
+    searchBtn.addEventListener('click', openSearch);
+  }
+
+  if (searchClose) {
+    searchClose.addEventListener('click', closeSearch);
+  }
+
+  if (searchOverlay) {
+    searchOverlay.addEventListener('click', closeSearch);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && searchModal && searchModal.classList.contains('active')) {
+      closeSearch();
+    }
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => handleSearch(this.value), 300);
+    });
+  }
+
+  // ===== Header Search Bar (desktop) =====
+  const headerSearchInput = document.getElementById('headerSearchInput');
+  if (headerSearchInput) {
+    headerSearchInput.addEventListener('focus', function () {
+      // On shop page, focus the shop search bar instead
+      const shopInput = document.getElementById('shopSearchInput');
+      if (shopInput) {
+        this.blur();
+        shopInput.focus();
+        shopInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      // On other pages, open the search modal
+      openSearch();
+      this.blur();
+    });
+    headerSearchInput.addEventListener('input', function () {
+      const shopInput = document.getElementById('shopSearchInput');
+      if (!shopInput) {
+        openSearch();
+        if (searchInput) {
+          searchInput.value = this.value;
+          handleSearch(this.value);
+        }
+        this.blur();
+      }
+    });
+  }
+
+  // ===== Shop Page Search Bar =====
+  const shopSearchInput = document.getElementById('shopSearchInput');
+  if (shopSearchInput) {
+    let shopSearchTimeout = null;
+    shopSearchInput.addEventListener('input', function () {
+      clearTimeout(shopSearchTimeout);
+      shopSearchTimeout = setTimeout(async () => {
+        const query = this.value.trim().toLowerCase();
+        const productsGrid = document.getElementById('productsGrid');
+        if (!productsGrid) return;
+
+        if (!query || query.length < 2) {
+          // Reset: show all products by triggering existing filter system
+          if (typeof applyFiltersAndSort === 'function') {
+            applyFiltersAndSort();
+          } else if (typeof window.shopSearch === 'function') {
+            window.shopSearch('');
+          } else {
+            // Fallback: show all product cards
+            productsGrid.querySelectorAll('.product-card').forEach(card => card.style.display = '');
+          }
+          return;
+        }
+
+        // Filter product cards directly on the page
+        const cards = productsGrid.querySelectorAll('.product-card');
+        let visibleCount = 0;
+        cards.forEach(card => {
+          const name = (card.querySelector('.product-name')?.textContent || '').toLowerCase();
+          const code = (card.querySelector('.product-code')?.textContent || '').toLowerCase();
+          const category = (card.querySelector('.product-category')?.textContent || '').toLowerCase();
+          if (name.includes(query) || code.includes(query) || category.includes(query)) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Also search from Firestore for products not yet loaded
+        if (visibleCount === 0) {
+          const products = await loadProducts();
+          const matches = products.filter(p => {
+            const n = (p.name || '').toLowerCase();
+            const c = (p.sareeCode || '').toLowerCase();
+            const cat = (p.category || '').toLowerCase();
+            const col = (p.color || '').toLowerCase();
+            return n.includes(query) || c.includes(query) || cat.includes(query) || col.includes(query);
+          });
+          if (matches.length > 0) {
+            // Redirect to search with results shown in modal
+            openSearch();
+            if (searchInput) {
+              searchInput.value = this.value;
+              handleSearch(this.value);
+            }
+          }
+        }
+      }, 300);
     });
   }
 

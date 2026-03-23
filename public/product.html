@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CQ5DZVP8MZ"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-CQ5DZVP8MZ");</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Premium handwoven silk saree from Premam Silks.">
@@ -10,6 +13,18 @@
     <meta property="og:type" content="product">
     <title>Product | Premam Silks</title>
 
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="canonical" href="https://premamsilks.com/product.html">
+    <meta property="og:image" content="https://premamsilks.com/images/og-image.jpg">
+    <meta property="og:url" content="https://premamsilks.com/product.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Product | Premam Silks">
+    <meta name="twitter:description" content="Premium handwoven silk saree from Premam Silks.">
+    <meta name="twitter:image" content="https://premamsilks.com/images/og-image.jpg">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,6 +60,12 @@
                 <li><a href="about.html" class="nav-link">About Us</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
+
+            <!-- Header Search Bar (desktop) -->
+            <div class="header-search">
+              <svg class="header-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" class="header-search-input" id="headerSearchInput" placeholder="Search by name, code, or category..." autocomplete="off">
+            </div>
 
             <div class="nav-icons">
                 <button class="nav-icon" id="searchBtn" aria-label="Search">
@@ -291,6 +312,68 @@
                 document.title = (p.name || 'Product') + ' | Premam Silks';
                 document.getElementById('breadcrumbName').textContent = p.name || 'Product';
 
+                // Dynamic SEO meta tags
+                var fullUrl = window.location.href;
+                var metaUpdates = {
+                    'og:title': (p.name || 'Product') + ' | Premam Silks',
+                    'og:description': p.description || ('Premium handwoven ' + (p.category || 'silk') + ' saree from Premam Silks. ' + (p.color ? p.color + ' colour. ' : '') + 'Price: ' + fmt(p.price)),
+                    'og:image': mainImg.startsWith('http') ? mainImg : 'https://premamsilks.com/' + mainImg,
+                    'og:url': fullUrl
+                };
+                Object.keys(metaUpdates).forEach(function(prop) {
+                    var el = document.querySelector('meta[property="' + prop + '"]');
+                    if (el) el.setAttribute('content', metaUpdates[prop]);
+                });
+                var descMeta = document.querySelector('meta[name="description"]');
+                if (descMeta) descMeta.setAttribute('content', metaUpdates['og:description']);
+                // Update twitter tags
+                var twitterMap = { 'twitter:title': metaUpdates['og:title'], 'twitter:description': metaUpdates['og:description'], 'twitter:image': metaUpdates['og:image'] };
+                Object.keys(twitterMap).forEach(function(name) {
+                    var el = document.querySelector('meta[name="' + name + '"]');
+                    if (el) el.setAttribute('content', twitterMap[name]);
+                });
+                // Update canonical
+                var canonical = document.querySelector('link[rel="canonical"]');
+                if (canonical) canonical.setAttribute('href', fullUrl);
+
+                // Product JSON-LD Schema
+                var productSchema = {
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    'name': p.name || 'Silk Saree',
+                    'description': p.description || 'Premium handwoven silk saree from Premam Silks.',
+                    'image': mainImg.startsWith('http') ? mainImg : 'https://premamsilks.com/' + mainImg,
+                    'brand': { '@type': 'Brand', 'name': 'Premam Silks' },
+                    'offers': {
+                        '@type': 'Offer',
+                        'url': fullUrl,
+                        'priceCurrency': 'INR',
+                        'price': p.price || 0,
+                        'availability': (p.stock === undefined || p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+                    }
+                };
+                if (p.sareeCode) productSchema['sku'] = p.sareeCode;
+                if (p.category) productSchema['category'] = p.category;
+                var schemaScript = document.createElement('script');
+                schemaScript.type = 'application/ld+json';
+                schemaScript.textContent = JSON.stringify(productSchema);
+                document.head.appendChild(schemaScript);
+
+                // Breadcrumb JSON-LD
+                var breadcrumbSchema = {
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    'itemListElement': [
+                        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://premamsilks.com/' },
+                        { '@type': 'ListItem', 'position': 2, 'name': 'Sarees', 'item': 'https://premamsilks.com/shop.html' },
+                        { '@type': 'ListItem', 'position': 3, 'name': p.name || 'Product', 'item': fullUrl }
+                    ]
+                };
+                var bcScript = document.createElement('script');
+                bcScript.type = 'application/ld+json';
+                bcScript.textContent = JSON.stringify(breadcrumbSchema);
+                document.head.appendChild(bcScript);
+
                 // Build badges
                 var badges = '';
                 if (p.badge) badges += '<span class="badge-new">' + esc(p.badge) + '</span>';
@@ -361,6 +444,10 @@
                         '<div style="margin-top:20px;padding:16px;background:#faf7f0;border:1px solid #e8dcc8;border-radius:8px;font-size:0.8rem;color:#6b5e4f;line-height:1.6;">' +
                             '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                             '<strong>Please Note:</strong> We strive to represent our sarees in their truest form. However, the actual colour may vary slightly due to photographic lighting or your monitor settings. The intricate handloom weave may also have slight irregularities, which are the hallmark of an authentic handcrafted product.' +
+                        '</div>' +
+                        '<div class="discount-note" style="margin-top:16px;">' +
+                            '<span class="discount-note-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>' +
+                            '<p>Looking for exclusive discounts? <a href="https://wa.me/917200123457?text=' + encodeURIComponent("Hi Premam Silks! I'd like a discount coupon for this saree:\n\n*" + (p.name || 'Saree') + "*\n" + (p.sareeCode ? "Saree Code: " + p.sareeCode + "\n" : "") + "Price: " + fmt(p.price) + "\n" + (p.category ? "Category: " + p.category + "\n" : "") + "\n" + productUrl) + '" target="_blank">WhatsApp us</a> for special coupon codes!</p>' +
                         '</div>' +
                     '</div>' +
                 '</div>';
@@ -474,6 +561,23 @@
         document.addEventListener('DOMContentLoaded', function() { tryLoad(0); });
     })();
     </script>
+<!-- Search Modal -->
+<div class="search-overlay" id="searchOverlay"></div>
+<div class="search-modal" id="searchModal">
+  <div class="search-modal-inner">
+    <div class="search-header">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by name, code, or category..." autocomplete="off">
+      </div>
+      <button class="search-close" id="searchClose">&times;</button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <p class="search-hint">Search by product name, saree code, or category</p>
+    </div>
+  </div>
+</div>
+    <script src="js/page-tracker.js"></script>
 </body>
 
 </html>

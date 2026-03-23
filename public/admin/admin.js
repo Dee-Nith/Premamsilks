@@ -12,6 +12,7 @@ const AdminApp = (function () {
     let currentTab = 'dashboard';
     let allProducts = [];
     let allOrders = [];
+    let allCoupons = [];
     let pendingImageFiles = []; // Files staged for upload
     let existingImageUrls = []; // Already-uploaded image URLs (for editing)
     let storage = null; // Firebase Storage reference
@@ -134,13 +135,14 @@ const AdminApp = (function () {
         document.getElementById(`tab-${tab}`)?.classList.add('active');
 
         // Update page title
-        const titles = { dashboard: 'Dashboard', products: 'Products', orders: 'Orders', settings: 'Settings' };
+        const titles = { dashboard: 'Dashboard', products: 'Products', orders: 'Orders', coupons: 'Coupons', settings: 'Settings' };
         const titleEl = document.getElementById('pageTitle');
         if (titleEl) titleEl.textContent = titles[tab] || tab;
 
         // Load tab-specific data
         if (tab === 'products') loadProducts();
         if (tab === 'orders') loadOrders();
+        if (tab === 'coupons') loadCoupons();
 
         // Close mobile sidebar
         document.getElementById('adminSidebar')?.classList.remove('open');
@@ -169,6 +171,7 @@ const AdminApp = (function () {
 
             updateMetrics();
             renderRecentOrders();
+            renderAllCharts();
         } catch (error) {
             console.error('Error loading dashboard:', error);
             // Fallback to demo
@@ -176,6 +179,7 @@ const AdminApp = (function () {
             allProducts = getDemoProducts();
             updateMetrics();
             renderRecentOrders();
+            renderAllCharts();
         }
     }
 
@@ -1070,6 +1074,698 @@ const AdminApp = (function () {
     }
 
     // ============================================================
+    // COUPONS MANAGEMENT
+    // ============================================================
+
+    async function loadCoupons() {
+        try {
+            if (db) {
+                const snap = await db.collection('coupons').orderBy('createdAt', 'desc').get();
+                allCoupons = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+        } catch (error) {
+            console.error('Error loading coupons:', error);
+        }
+        renderCoupons();
+    }
+
+    function renderCoupons(searchQuery = '') {
+        const tbody = document.getElementById('couponsTableBody');
+        if (!tbody) return;
+
+        let coupons = allCoupons;
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            coupons = coupons.filter(c => c.code?.toLowerCase().includes(q));
+        }
+
+        if (coupons.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8"><div class="empty-state-small">No coupons found. Click "Add Coupon" to create one.</div></td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = coupons.map(c => {
+            const isExpired = c.expiryDate && c.expiryDate.toDate && c.expiryDate.toDate() < new Date();
+            const statusClass = c.isActive && !isExpired ? 'status-active' : 'status-inactive';
+            const statusText = !c.isActive ? 'Inactive' : isExpired ? 'Expired' : 'Active';
+            const expiryStr = c.expiryDate && c.expiryDate.toDate
+                ? c.expiryDate.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                : 'No expiry';
+            const usesStr = c.maxUses > 0 ? `${c.currentUses || 0}/${c.maxUses}` : `${c.currentUses || 0}/∞`;
+
+            return `
+            <tr>
+                <td><strong style="letter-spacing:0.05em;">${c.code}</strong></td>
+                <td>${c.discountType === 'percentage' ? 'Percentage' : 'Fixed'}</td>
+                <td>${c.discountType === 'percentage' ? c.discountValue + '%' : formatPrice(c.discountValue)}</td>
+                <td>${usesStr}</td>
+                <td>${c.minOrderValue ? formatPrice(c.minOrderValue) : '—'}</td>
+                <td>${expiryStr}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>
+                    <div class="table-actions">
+                        <button class="table-action-btn" onclick="AdminApp.editCoupon('${c.id}')" title="Edit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button class="table-action-btn danger" onclick="AdminApp.deleteCoupon('${c.id}')" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function openCouponModal(coupon = null) {
+        const overlay = document.getElementById('couponModalOverlay');
+        const title = document.getElementById('couponModalTitle');
+
+        document.getElementById('couponId').value = coupon?.id || '';
+        document.getElementById('couponCode').value = coupon?.code || '';
+        document.getElementById('couponActive').value = coupon ? String(coupon.isActive !== false) : 'true';
+        document.getElementById('couponType').value = coupon?.discountType || 'fixed';
+        document.getElementById('couponValue').value = coupon?.discountValue || '';
+        document.getElementById('couponMinOrder').value = coupon?.minOrderValue || 0;
+        document.getElementById('couponMaxDiscount').value = coupon?.maxDiscount || 0;
+        document.getElementById('couponMaxUses').value = coupon?.maxUses || 0;
+        document.getElementById('couponExpiry').value = coupon?.expiryDate && coupon.expiryDate.toDate
+            ? coupon.expiryDate.toDate().toISOString().split('T')[0]
+            : '';
+
+        if (title) title.textContent = coupon ? 'Edit Coupon' : 'Add Coupon';
+        overlay?.classList.add('open');
+    }
+
+    function closeCouponModal() {
+        document.getElementById('couponModalOverlay')?.classList.remove('open');
+        document.getElementById('couponForm')?.reset();
+        document.getElementById('couponId').value = '';
+    }
+
+    async function saveCoupon() {
+        const id = document.getElementById('couponId').value;
+        const code = document.getElementById('couponCode').value.trim().toUpperCase();
+        const discountType = document.getElementById('couponType').value;
+        const discountValue = Number(document.getElementById('couponValue').value);
+        const minOrderValue = Number(document.getElementById('couponMinOrder').value) || 0;
+        const maxDiscount = Number(document.getElementById('couponMaxDiscount').value) || 0;
+        const maxUses = Number(document.getElementById('couponMaxUses').value) || 0;
+        const isActive = document.getElementById('couponActive').value === 'true';
+        const expiryStr = document.getElementById('couponExpiry').value;
+
+        if (!code || !discountValue) {
+            showNotification('Please fill in code and discount value', 'error');
+            return;
+        }
+
+        const data = {
+            code,
+            discountType,
+            discountValue,
+            minOrderValue,
+            maxDiscount,
+            maxUses,
+            isActive,
+            expiryDate: expiryStr ? firebase.firestore.Timestamp.fromDate(new Date(expiryStr + 'T23:59:59')) : null,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            if (id) {
+                await db.collection('coupons').doc(id).update(data);
+                showNotification('Coupon updated successfully', 'success');
+            } else {
+                data.currentUses = 0;
+                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                await db.collection('coupons').add(data);
+                showNotification('Coupon created successfully', 'success');
+            }
+
+            closeCouponModal();
+            loadCoupons();
+        } catch (error) {
+            console.error('Error saving coupon:', error);
+            showNotification('Error saving coupon', 'error');
+        }
+    }
+
+    function editCoupon(couponId) {
+        const coupon = allCoupons.find(c => c.id === couponId);
+        if (!coupon) return;
+        openCouponModal(coupon);
+    }
+
+    function deleteCoupon(couponId) {
+        const coupon = allCoupons.find(c => c.id === couponId);
+        const couponCode = coupon?.code || 'this coupon';
+
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+            <div style="background:var(--admin-surface, #1e1e2e);border:1px solid var(--admin-border, #333);border-radius:12px;padding:28px;max-width:400px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+                <h3 style="color:#fff;margin:0 0 8px;font-size:1.1rem;">Delete Coupon?</h3>
+                <p style="color:#aaa;font-size:0.85rem;margin:0 0 24px;line-height:1.5;">Delete coupon <strong style="color:#fff;">${couponCode}</strong>? This cannot be undone.</p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button id="confirmCouponDeleteCancel" style="padding:10px 24px;border-radius:8px;border:1px solid var(--admin-border, #444);background:transparent;color:#ccc;cursor:pointer;font-size:0.85rem;font-weight:500;">Cancel</button>
+                    <button id="confirmCouponDeleteYes" style="padding:10px 24px;border-radius:8px;border:none;background:#ef4444;color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;">Delete</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.querySelector('#confirmCouponDeleteCancel').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        overlay.querySelector('#confirmCouponDeleteYes').addEventListener('click', async () => {
+            overlay.remove();
+            try {
+                if (db) await db.collection('coupons').doc(couponId).delete();
+                allCoupons = allCoupons.filter(c => c.id !== couponId);
+                renderCoupons();
+                showNotification('Coupon deleted', 'success');
+            } catch (error) {
+                console.error('Error deleting coupon:', error);
+                showNotification('Error deleting coupon', 'error');
+            }
+        });
+    }
+
+    function initCouponModal() {
+        const addBtn = document.getElementById('addCouponBtn');
+        const overlay = document.getElementById('couponModalOverlay');
+        const closeBtn = document.getElementById('couponModalClose');
+        const cancelBtn = document.getElementById('couponCancelBtn');
+        const form = document.getElementById('couponForm');
+        const searchInput = document.getElementById('couponSearch');
+
+        addBtn?.addEventListener('click', () => openCouponModal());
+        closeBtn?.addEventListener('click', () => closeCouponModal());
+        cancelBtn?.addEventListener('click', () => closeCouponModal());
+        overlay?.addEventListener('click', (e) => {
+            if (e.target === overlay) closeCouponModal();
+        });
+
+        form?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveCoupon();
+        });
+
+        searchInput?.addEventListener('input', (e) => {
+            renderCoupons(e.target.value);
+        });
+    }
+
+    // ============================================================
+    // CHARTS — Dashboard Analytics
+    // ============================================================
+
+    let revenueChartInstance = null;
+    let orderStatusChartInstance = null;
+    let topProductsChartInstance = null;
+    let categoryChartInstance = null;
+    let salesTrendChartInstance = null;
+
+    const CHART_COLORS = {
+        gold: '#d4a853',
+        primary: '#1a7a6e',
+        palette: ['#d4a853', '#1a7a6e', '#4299e1', '#25D366', '#f0b429', '#e53e3e', '#9f7aea', '#ed64a6']
+    };
+
+    const STATUS_COLORS = {
+        pending: '#f0b429',
+        paid: '#4299e1',
+        processing: '#1a7a6e',
+        shipped: '#25D366',
+        delivered: '#0d6157',
+        cancelled: '#e53e3e',
+        unknown: '#8a9e99'
+    };
+
+    function configureChartDefaults() {
+        if (typeof Chart === 'undefined') return;
+        Chart.defaults.color = '#8a9e99';
+        Chart.defaults.borderColor = 'rgba(212, 168, 83, 0.08)';
+        Chart.defaults.font.family = "'Inter', 'Montserrat', sans-serif";
+        Chart.defaults.font.size = 11;
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.pointStyleWidth = 8;
+        Chart.defaults.plugins.legend.labels.padding = 16;
+        Chart.defaults.plugins.tooltip.backgroundColor = '#132e29';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(212, 168, 83, 0.2)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleColor = '#f4e5c3';
+        Chart.defaults.plugins.tooltip.bodyColor = '#e8e4dc';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    }
+
+    function getDateKey(date) {
+        let d;
+        if (date && date.toDate) d = date.toDate();
+        else if (date instanceof Date) d = date;
+        else d = new Date(date);
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().split('T')[0];
+    }
+
+    function getRevenueByDay(days) {
+        const now = new Date();
+        const dayMap = {};
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now.getTime() - i * 86400000);
+            dayMap[getDateKey(d)] = 0;
+        }
+        allOrders
+            .filter(o => ['paid', 'delivered', 'shipped', 'processing'].includes(o.status))
+            .forEach(o => {
+                const key = getDateKey(o.createdAt);
+                if (key && dayMap.hasOwnProperty(key)) dayMap[key] += (o.totalAmount || 0);
+            });
+        const labels = Object.keys(dayMap).map(k => {
+            const d = new Date(k);
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        });
+        return { labels, data: Object.values(dayMap) };
+    }
+
+    function getOrdersByDay(days) {
+        const now = new Date();
+        const dayMap = {};
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now.getTime() - i * 86400000);
+            dayMap[getDateKey(d)] = 0;
+        }
+        allOrders.forEach(o => {
+            const key = getDateKey(o.createdAt);
+            if (key && dayMap.hasOwnProperty(key)) dayMap[key]++;
+        });
+        const labels = Object.keys(dayMap).map(k => {
+            const d = new Date(k);
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        });
+        return { labels, data: Object.values(dayMap) };
+    }
+
+    function getOrderStatusData() {
+        const statusMap = {};
+        allOrders.forEach(o => {
+            const s = o.status || 'unknown';
+            statusMap[s] = (statusMap[s] || 0) + 1;
+        });
+        return {
+            labels: Object.keys(statusMap).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+            data: Object.values(statusMap),
+            keys: Object.keys(statusMap)
+        };
+    }
+
+    function getTopProductsData() {
+        const productRevenue = {};
+        allOrders
+            .filter(o => ['paid', 'delivered', 'shipped', 'processing'].includes(o.status))
+            .forEach(o => {
+                (o.items || []).forEach(item => {
+                    const name = item.name || 'Unknown';
+                    productRevenue[name] = (productRevenue[name] || 0) + ((item.price || 0) * (item.quantity || 1));
+                });
+            });
+        const sorted = Object.entries(productRevenue).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        return {
+            labels: sorted.map(([name]) => name.length > 25 ? name.slice(0, 25) + '...' : name),
+            data: sorted.map(([, rev]) => rev)
+        };
+    }
+
+    function getCategoryData() {
+        const catMap = {};
+        allProducts.forEach(p => {
+            const cat = (p.category || 'Uncategorized');
+            const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+            catMap[label] = (catMap[label] || 0) + 1;
+        });
+        return { labels: Object.keys(catMap), data: Object.values(catMap) };
+    }
+
+    function renderRevenueChart(days) {
+        if (typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('revenueChart');
+        if (!ctx) return;
+        const { labels, data } = getRevenueByDay(days || 7);
+        if (revenueChartInstance) revenueChartInstance.destroy();
+        revenueChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data,
+                    borderColor: CHART_COLORS.gold,
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const { ctx: c, chartArea } = chart;
+                        if (!chartArea) return 'rgba(212, 168, 83, 0.15)';
+                        const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        gradient.addColorStop(0, 'rgba(212, 168, 83, 0.25)');
+                        gradient.addColorStop(1, 'rgba(212, 168, 83, 0.02)');
+                        return gradient;
+                    },
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2.5,
+                    pointRadius: 3,
+                    pointBackgroundColor: CHART_COLORS.gold,
+                    pointBorderColor: '#132e29',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: function(ctx) { return ' Revenue: ' + formatPrice(ctx.parsed.y); } } }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxRotation: 0, maxTicksLimit: 8 } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(212, 168, 83, 0.06)' },
+                        ticks: { callback: function(val) { return val >= 1000 ? '₹' + (val / 1000).toFixed(0) + 'K' : '₹' + val; } }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderOrderStatusChart() {
+        if (typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('orderStatusChart');
+        if (!ctx) return;
+        const { labels, data, keys } = getOrderStatusData();
+        if (data.length === 0) return;
+        const colors = keys.map(function(k) { return STATUS_COLORS[k] || STATUS_COLORS.unknown; });
+        if (orderStatusChartInstance) orderStatusChartInstance.destroy();
+        orderStatusChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{ data, backgroundColor: colors, borderColor: '#132e29', borderWidth: 3, hoverOffset: 6 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed + ' orders'; } } }
+                }
+            }
+        });
+    }
+
+    function renderTopProductsChart() {
+        if (typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('topProductsChart');
+        if (!ctx) return;
+        const { labels, data } = getTopProductsData();
+        if (data.length === 0) return;
+        if (topProductsChartInstance) topProductsChartInstance.destroy();
+        topProductsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data,
+                    backgroundColor: function(context) {
+                        var idx = context.dataIndex;
+                        var total = context.dataset.data.length;
+                        var ratio = idx / Math.max(total - 1, 1);
+                        return 'rgba(' + Math.round(212 - ratio * 186) + ',' + Math.round(168 - ratio * 46) + ',' + Math.round(83 + ratio * 27) + ',0.8)';
+                    },
+                    borderColor: 'transparent',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    barThickness: 22,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: function(ctx) { return ' Revenue: ' + formatPrice(ctx.parsed.x); } } }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(212, 168, 83, 0.06)' },
+                        ticks: { callback: function(val) { return val >= 1000 ? '₹' + (val / 1000).toFixed(0) + 'K' : '₹' + val; } }
+                    },
+                    y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    function renderCategoryChart() {
+        if (typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('categoryChart');
+        if (!ctx) return;
+        const { labels, data } = getCategoryData();
+        if (data.length === 0) return;
+        if (categoryChartInstance) categoryChartInstance.destroy();
+        categoryChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{ data, backgroundColor: CHART_COLORS.palette.slice(0, labels.length), borderColor: '#132e29', borderWidth: 3, hoverOffset: 6 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed + ' products'; } } }
+                }
+            }
+        });
+    }
+
+    function renderSalesTrendChart(days) {
+        if (typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('salesTrendChart');
+        if (!ctx) return;
+        const { labels, data } = getOrdersByDay(days || 7);
+        if (salesTrendChartInstance) salesTrendChartInstance.destroy();
+        salesTrendChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Orders',
+                    data,
+                    backgroundColor: 'rgba(26, 122, 110, 0.6)',
+                    hoverBackgroundColor: 'rgba(26, 122, 110, 0.85)',
+                    borderColor: 'transparent',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.parsed.y + ' order' + (ctx.parsed.y !== 1 ? 's' : ''); } } }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxRotation: 0, maxTicksLimit: 10 } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(212, 168, 83, 0.06)' },
+                        ticks: { stepSize: 1, precision: 0 }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderAllCharts() {
+        if (typeof Chart === 'undefined') return;
+        configureChartDefaults();
+        renderRevenueChart(7);
+        renderOrderStatusChart();
+        renderTopProductsChart();
+        renderCategoryChart();
+        renderSalesTrendChart(7);
+        renderVisitorsChart(7);
+        renderPopularPagesChart();
+    }
+
+    // ============================================================
+    // VISITOR ANALYTICS CHARTS
+    // ============================================================
+
+    let visitorsChartInstance = null;
+    let popularPagesChartInstance = null;
+    let cachedPageViewDocs = null;
+
+    async function loadPageViewData() {
+        if (cachedPageViewDocs) return cachedPageViewDocs;
+        if (!db) return [];
+        try {
+            const snap = await db.collection('pageViews').orderBy('date', 'desc').limit(90).get();
+            cachedPageViewDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return cachedPageViewDocs;
+        } catch (e) {
+            console.warn('Could not load page views:', e);
+            return [];
+        }
+    }
+
+    async function renderVisitorsChart(days) {
+        const canvas = document.getElementById('visitorsChart');
+        if (!canvas) return;
+
+        const allData = await loadPageViewData();
+
+        // Build date labels for last N days
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const shortLabel = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            labels.push(shortLabel);
+            const doc = allData.find(v => v.id === dateStr);
+            data.push(doc ? (doc.totalViews || 0) : 0);
+        }
+
+        // Update metric card
+        const totalViews = data.reduce((a, b) => a + b, 0);
+        const todayViews = data[data.length - 1] || 0;
+        const el = document.getElementById('totalPageViews');
+        if (el) el.textContent = totalViews.toLocaleString('en-IN');
+        const todayEl = document.getElementById('todayPageViews');
+        if (todayEl) todayEl.textContent = todayViews + ' today';
+
+        if (visitorsChartInstance) visitorsChartInstance.destroy();
+        visitorsChartInstance = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Page Views',
+                    data: data,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#0284c7'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    async function renderPopularPagesChart() {
+        const canvas = document.getElementById('popularPagesChart');
+        if (!canvas) return;
+
+        const allData = await loadPageViewData();
+
+        // Aggregate page views across all days (last 30 days)
+        const pageTotals = {};
+        const now = new Date();
+        allData.forEach(doc => {
+            const docDate = new Date(doc.id);
+            const diffDays = (now - docDate) / (1000 * 60 * 60 * 24);
+            if (diffDays <= 30 && doc.pages) {
+                Object.keys(doc.pages).forEach(page => {
+                    pageTotals[page] = (pageTotals[page] || 0) + doc.pages[page];
+                });
+            }
+        });
+
+        // Sort and take top 8
+        const sorted = Object.entries(pageTotals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+        if (sorted.length === 0) {
+            sorted.push(['No data yet', 0]);
+        }
+
+        const pageNames = {
+            'home': 'Home', 'index': 'Home', 'shop': 'Shop', 'product': 'Product',
+            'checkout': 'Checkout', 'about': 'About', 'contact': 'Contact',
+            'care-guide': 'Care Guide', 'size-guide': 'Size Guide',
+            'shipping': 'Shipping', 'returns': 'Returns', 'privacy': 'Privacy',
+            'terms': 'Terms', 'invitation': 'Invitation', 'launch': 'Launch'
+        };
+
+        const labels = sorted.map(s => pageNames[s[0]] || s[0]);
+        const data = sorted.map(s => s[1]);
+        const colors = ['#0d6157', '#0284c7', '#7c3aed', '#db2777', '#ea580c', '#65a30d', '#0891b2', '#6366f1'];
+
+        if (popularPagesChartInstance) popularPagesChartInstance.destroy();
+        popularPagesChartInstance = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Views (30d)',
+                    data: data,
+                    backgroundColor: colors.slice(0, data.length),
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    function initChartToggles() {
+        document.querySelectorAll('.chart-period-toggle .period-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var toggle = btn.closest('.chart-period-toggle');
+                toggle.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                var period = btn.dataset.period;
+                var days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+                var chartType = btn.dataset.chart;
+                if (chartType === 'revenue') renderRevenueChart(days);
+                if (chartType === 'sales') renderSalesTrendChart(days);
+                if (chartType === 'visitors') { cachedPageViewDocs = null; renderVisitorsChart(days); }
+            });
+        });
+    }
+
+    // ============================================================
     // INIT
     // ============================================================
 
@@ -1095,9 +1791,11 @@ const AdminApp = (function () {
         initAuth();
         initTabs();
         initProductModal();
+        initCouponModal();
         initOrderFilters();
         initSettings();
         initSidebar();
+        initChartToggles();
 
         console.log('🛡️ Admin Dashboard initialized');
     }
@@ -1116,6 +1814,8 @@ const AdminApp = (function () {
     return {
         editProduct,
         deleteProduct,
+        editCoupon,
+        deleteCoupon,
         updateOrderStatus,
         viewOrder
     };

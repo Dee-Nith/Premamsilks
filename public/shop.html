@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CQ5DZVP8MZ"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-CQ5DZVP8MZ");</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
@@ -12,6 +15,17 @@
     <meta property="og:url" content="https://premamsilks.com/shop.html">
     <title>Shop Silk Sarees | Premam Silks</title>
 
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="canonical" href="https://premamsilks.com/shop.html">
+    <meta property="og:image" content="https://premamsilks.com/images/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Shop Silk Sarees | Premam Silks">
+    <meta name="twitter:description" content="Shop our exquisite collection of handwoven silk sarees. Kanjivaram, Banarasi, bridal and contemporary designs. Free shipping on orders above ₹25,000.">
+    <meta name="twitter:image" content="https://premamsilks.com/images/og-image.jpg">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +37,18 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/shop.css">
     <link rel="stylesheet" href="css/cart.css">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://premamsilks.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Sarees", "item": "https://premamsilks.com/shop.html" }
+      ]
+    }
+    </script>
 </head>
 
 <body>
@@ -48,6 +74,12 @@
                 <li><a href="about.html" class="nav-link">About Us</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
+
+            <!-- Header Search Bar (desktop) -->
+            <div class="header-search">
+              <svg class="header-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" class="header-search-input" id="headerSearchInput" placeholder="Search by name, code, or category..." autocomplete="off">
+            </div>
 
             <div class="nav-icons">
                 <button class="nav-icon" id="searchBtn" aria-label="Search">
@@ -114,6 +146,14 @@
             </nav>
             <h1>Our Saree Collection</h1>
             <p>Discover handwoven masterpieces, each telling a story of tradition and elegance</p>
+        </div>
+    </section>
+
+    <!-- Shop Search Bar -->
+    <section style="padding: 0 var(--container-padding); max-width: var(--container-max); margin: -1rem auto 0;">
+        <div class="shop-search-bar">
+            <svg class="shop-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" class="shop-search-input" id="shopSearchInput" placeholder="Search by saree name, code, or category..." autocomplete="off">
         </div>
     </section>
 
@@ -354,6 +394,23 @@
     <script src="js/wishlist.js?v=1.0"></script>
     <script src="js/shop-dynamic.js?v=1.1"></script>
     <script src="js/script.js?v=2.0"></script>
+<!-- Search Modal -->
+<div class="search-overlay" id="searchOverlay"></div>
+<div class="search-modal" id="searchModal">
+  <div class="search-modal-inner">
+    <div class="search-header">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by name, code, or category..." autocomplete="off">
+      </div>
+      <button class="search-close" id="searchClose">&times;</button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <p class="search-hint">Search by product name, saree code, or category</p>
+    </div>
+  </div>
+</div>
+    <script src="js/page-tracker.js"></script>
 </body>
 
 </html>

@@ -150,7 +150,8 @@ const Collections = {
     PRODUCTS: 'products',
     ORDERS: 'orders',
     CATEGORIES: 'categories',
-    SETTINGS: 'settings'
+    SETTINGS: 'settings',
+    COUPONS: 'coupons'
 };
 
 /**

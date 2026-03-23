@@ -398,6 +398,109 @@ a.progress-step:hover .step-text {
     white-space: nowrap;
 }
 
+/* --- Coupon Section --- */
+.coupon-section {
+    padding: 16px 0;
+    border-top: 1px solid #f0f0f0;
+    margin-bottom: 4px;
+}
+
+.coupon-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.coupon-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.coupon-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-family: var(--font-body, 'Montserrat', sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1a1a2e;
+    transition: border-color 0.2s ease;
+}
+
+.coupon-input:focus {
+    outline: none;
+    border-color: var(--color-primary, #8B1A2B);
+    box-shadow: 0 0 0 3px rgba(139, 26, 43, 0.1);
+}
+
+.coupon-input[readonly] {
+    background: #f9f6f0;
+    color: #166534;
+    border-color: #25D366;
+}
+
+.coupon-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-family: var(--font-body, 'Montserrat', sans-serif);
+}
+
+.coupon-apply-btn {
+    background: var(--color-primary, #8B1A2B);
+    color: #fff;
+}
+
+.coupon-apply-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.coupon-remove-btn {
+    background: #f5f5f5;
+    color: #e53e3e;
+    border: 1px solid #eee;
+}
+
+.coupon-remove-btn:hover {
+    background: #fee;
+    border-color: #e53e3e;
+}
+
+.coupon-message {
+    font-size: 0.78rem;
+    margin-top: 6px;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+.coupon-success {
+    color: #166534;
+}
+
+.coupon-error {
+    color: #e53e3e;
+}
+
+/* --- Discount Row --- */
+.discount-row {
+    color: #166534 !important;
+    font-weight: 600;
+}
+
+.discount-row span {
+    color: #166534;
+}
+
 /* --- Totals --- */
 .order-totals {
     border-top: 2px solid #f0f0f0;
@@ -484,7 +587,7 @@ a.progress-step:hover .step-text {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .checkout-grid {
         grid-template-columns: 1fr;
         gap: 24px;
