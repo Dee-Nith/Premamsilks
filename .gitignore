@@ -46,5 +46,4 @@ functions/.env
 /*.jpeg
 /Screenshot*
 
-# Allow screenshots folder
-!screenshots/
+screenshots/
