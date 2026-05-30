@@ -32,9 +32,9 @@
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/cart.css">
-    <link rel="stylesheet" href="css/product.css">
+    <link rel="stylesheet" href="css/styles.css?v=2.3">
+    <link rel="stylesheet" href="css/cart.css?v=2.3">
+    <link rel="stylesheet" href="css/product.css?v=2.3">
 </head>
 
 <body>
@@ -236,8 +236,8 @@
                     <h4>Shop</h4>
                     <ul class="footer-links">
                         <li><a href="shop.html">All Sarees</a></li>
-                        <li><a href="shop.html#kanjivaram">Kanjivaram</a></li>
-                        <li><a href="shop.html#banarasi">Banarasi</a></li>
+                        <li><a href="shop.html?category=kanjivaram">Kanjivaram</a></li>
+                        <li><a href="shop.html?category=banarasi">Banarasi</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -262,6 +262,18 @@
         </div>
     </footer>
 
+    <!-- Image Lightbox -->
+    <div class="img-lightbox" id="imgLightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <button class="img-lightbox-close" id="imgLightboxClose" aria-label="Close">&times;</button>
+        <span class="img-lightbox-counter" id="imgLightboxCounter">1 / 1</span>
+        <div class="img-lightbox-stage">
+            <button class="img-lightbox-nav prev" id="imgLightboxPrev" aria-label="Previous image">&#10094;</button>
+            <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
+            <button class="img-lightbox-nav next" id="imgLightboxNext" aria-label="Next image">&#10095;</button>
+        </div>
+        <div class="img-lightbox-thumbs" id="imgLightboxThumbs"></div>
+    </div>
+
     <!-- WhatsApp Float -->
     <a href="https://wa.me/917200123457" target="_blank" class="whatsapp-float"
         style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); z-index: 999;">
@@ -274,10 +286,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/wishlist.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/firebase-config.js?v=2.3"></script>
+    <script src="js/cart.js?v=2.3"></script>
+    <script src="js/wishlist.js?v=2.3"></script>
+    <script src="js/script.js?v=2.3"></script>
     <script>
     (function() {
         function esc(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
@@ -465,6 +477,9 @@
                     });
                 });
 
+                // Image lightbox
+                setupLightbox(images);
+
                 // Wire up tabs
                 document.querySelectorAll('.tab-btn').forEach(function(btn) {
                     btn.addEventListener('click', function() {
@@ -536,6 +551,75 @@
             });
         }
 
+        function setupLightbox(images) {
+            var lb = document.getElementById('imgLightbox');
+            var lbImg = document.getElementById('imgLightboxImg');
+            var lbCounter = document.getElementById('imgLightboxCounter');
+            var lbThumbs = document.getElementById('imgLightboxThumbs');
+            var lbClose = document.getElementById('imgLightboxClose');
+            var lbPrev = document.getElementById('imgLightboxPrev');
+            var lbNext = document.getElementById('imgLightboxNext');
+            var mainImage = document.getElementById('mainImage');
+            if (!lb || !mainImage || !images || images.length === 0) return;
+
+            var idx = 0;
+            var multi = images.length > 1;
+            lbPrev.style.display = multi ? '' : 'none';
+            lbNext.style.display = multi ? '' : 'none';
+
+            lbThumbs.innerHTML = images.map(function(src, i) {
+                return '<button class="img-lightbox-thumb' + (i === 0 ? ' active' : '') + '" data-i="' + i + '"><img src="' + esc(src) + '" alt="View ' + (i+1) + '"></button>';
+            }).join('');
+            if (!multi) lbThumbs.style.display = 'none';
+
+            function render() {
+                lbImg.src = images[idx];
+                lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+                var thumbs = lbThumbs.querySelectorAll('.img-lightbox-thumb');
+                thumbs.forEach(function(t) { t.classList.remove('active'); });
+                if (thumbs[idx]) {
+                    thumbs[idx].classList.add('active');
+                    thumbs[idx].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }
+
+            function open(startIdx) {
+                idx = Math.max(0, Math.min(startIdx || 0, images.length - 1));
+                render();
+                lb.classList.add('open');
+                document.body.classList.add('lightbox-open');
+            }
+            function close() {
+                lb.classList.remove('open');
+                document.body.classList.remove('lightbox-open');
+            }
+            function next() { idx = (idx + 1) % images.length; render(); }
+            function prev() { idx = (idx - 1 + images.length) % images.length; render(); }
+
+            mainImage.addEventListener('click', function() {
+                var current = mainImage.getAttribute('src');
+                var i = images.indexOf(current);
+                open(i >= 0 ? i : 0);
+            });
+
+            lbClose.addEventListener('click', close);
+            lbPrev.addEventListener('click', prev);
+            lbNext.addEventListener('click', next);
+            lb.addEventListener('click', function(e) { if (e.target === lb) close(); });
+            lbThumbs.addEventListener('click', function(e) {
+                var btn = e.target.closest('.img-lightbox-thumb');
+                if (!btn) return;
+                idx = parseInt(btn.dataset.i, 10) || 0;
+                render();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (!lb.classList.contains('open')) return;
+                if (e.key === 'Escape') close();
+                else if (e.key === 'ArrowRight' && multi) next();
+                else if (e.key === 'ArrowLeft' && multi) prev();
+            });
+        }
+
         function loadRelated(db, category, currentId) {
             if (!category) return;
             db.collection('products').where('category', '==', category).limit(5).get().then(function(snap) {
@@ -577,7 +661,7 @@
     </div>
   </div>
 </div>
-    <script src="js/page-tracker.js"></script>
+    <script src="js/page-tracker.js?v=2.3"></script>
 </body>
 
 </html>
