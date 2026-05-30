@@ -13,8 +13,10 @@ const AdminApp = (function () {
     let allProducts = [];
     let allOrders = [];
     let allCoupons = [];
-    let pendingImageFiles = []; // Files staged for upload
-    let existingImageUrls = []; // Already-uploaded image URLs (for editing)
+    let pendingImageFiles = []; // Files staged for upload (derived from imageItems on save)
+    let existingImageUrls = []; // Already-uploaded image URLs (derived from imageItems on save)
+    let imageItems = []; // Unified ordered list: { kind: 'url'|'file', value: string|File }
+    let dragSrcIndex = null;
     let storage = null; // Firebase Storage reference
 
     // ============================================================
@@ -135,7 +137,7 @@ const AdminApp = (function () {
         document.getElementById(`tab-${tab}`)?.classList.add('active');
 
         // Update page title
-        const titles = { dashboard: 'Dashboard', products: 'Products', orders: 'Orders', coupons: 'Coupons', settings: 'Settings' };
+        const titles = { dashboard: 'Dashboard', products: 'Products', orders: 'Orders', coupons: 'Coupons', activity: 'Activity Log', settings: 'Settings' };
         const titleEl = document.getElementById('pageTitle');
         if (titleEl) titleEl.textContent = titles[tab] || tab;
 
@@ -143,6 +145,7 @@ const AdminApp = (function () {
         if (tab === 'products') loadProducts();
         if (tab === 'orders') loadOrders();
         if (tab === 'coupons') loadCoupons();
+        if (tab === 'activity') loadActivity();
 
         // Close mobile sidebar
         document.getElementById('adminSidebar')?.classList.remove('open');
@@ -170,6 +173,7 @@ const AdminApp = (function () {
             }
 
             updateMetrics();
+            updateProductStats();
             renderRecentOrders();
             renderAllCharts();
         } catch (error) {
@@ -178,6 +182,7 @@ const AdminApp = (function () {
             allOrders = getDemoOrders();
             allProducts = getDemoProducts();
             updateMetrics();
+            updateProductStats();
             renderRecentOrders();
             renderAllCharts();
         }
@@ -249,6 +254,28 @@ const AdminApp = (function () {
         }
 
         renderProducts();
+        updateProductStats();
+    }
+
+    function updateProductStats() {
+        const total = allProducts.length;
+        const active = allProducts.filter(p => p.isActive !== false).length;
+        const inactive = total - active;
+
+        // Count sold from orders
+        let soldCount = 0;
+        allOrders.forEach(o => {
+            if (['paid', 'delivered', 'shipped', 'processing'].includes(o.status)) {
+                if (o.items) soldCount += o.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                else soldCount++;
+            }
+        });
+
+        const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+        el('statTotalProducts', total);
+        el('statActiveProducts', active);
+        el('statInactiveProducts', inactive);
+        el('statSoldProducts', soldCount);
     }
 
     function renderProducts(searchQuery = '') {
@@ -256,6 +283,8 @@ const AdminApp = (function () {
         if (!tbody) return;
 
         let products = allProducts;
+
+        // Search filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             products = products.filter(p =>
@@ -263,6 +292,35 @@ const AdminApp = (function () {
                 p.category?.toLowerCase().includes(q) ||
                 p.sareeCode?.toLowerCase().includes(q)
             );
+        }
+
+        // Price range filter
+        const priceFilter = document.getElementById('productPriceFilter')?.value;
+        if (priceFilter) {
+            products = products.filter(p => {
+                const price = p.price || 0;
+                switch (priceFilter) {
+                    case 'under-10000': return price < 10000;
+                    case '10000-25000': return price >= 10000 && price <= 25000;
+                    case '25000-50000': return price >= 25000 && price <= 50000;
+                    case '50000-100000': return price >= 50000 && price <= 100000;
+                    case 'above-100000': return price > 100000;
+                    default: return true;
+                }
+            });
+        }
+
+        // Category filter
+        const catFilter = document.getElementById('productCategoryFilter')?.value;
+        if (catFilter) {
+            products = products.filter(p => p.category?.toLowerCase() === catFilter);
+        }
+
+        // Status filter
+        const statusFilter = document.getElementById('productStatusFilter')?.value;
+        if (statusFilter) {
+            if (statusFilter === 'active') products = products.filter(p => p.isActive !== false);
+            else if (statusFilter === 'inactive') products = products.filter(p => p.isActive === false);
         }
 
         if (products.length === 0) {
@@ -332,6 +390,17 @@ const AdminApp = (function () {
 
         searchInput?.addEventListener('input', (e) => {
             renderProducts(e.target.value);
+        });
+
+        // Filter dropdowns
+        document.getElementById('productPriceFilter')?.addEventListener('change', () => {
+            renderProducts(searchInput?.value || '');
+        });
+        document.getElementById('productCategoryFilter')?.addEventListener('change', () => {
+            renderProducts(searchInput?.value || '');
+        });
+        document.getElementById('productStatusFilter')?.addEventListener('change', () => {
+            renderProducts(searchInput?.value || '');
         });
 
         // Image upload handlers
@@ -413,7 +482,7 @@ const AdminApp = (function () {
                 continue;
             }
 
-            pendingImageFiles.push(compressed);
+            imageItems.push({ kind: 'file', value: compressed });
         }
 
         renderImagePreviews();
@@ -425,29 +494,26 @@ const AdminApp = (function () {
         if (!container) return;
         container.innerHTML = '';
 
-        // Show existing uploaded image URLs
-        existingImageUrls.forEach((url, idx) => {
+        imageItems.forEach((it, idx) => {
             const item = document.createElement('div');
             item.className = 'image-preview-item';
+            item.draggable = true;
+            item.dataset.index = idx;
+            item.title = 'Drag to reorder. First image is the main image.';
             item.innerHTML = `
-                <img src="${url}" alt="Image ${idx + 1}">
-                <button type="button" class="image-preview-remove" data-type="existing" data-index="${idx}">&times;</button>
+                <img alt="Image ${idx + 1}">
+                <button type="button" class="image-preview-remove" data-index="${idx}" title="Remove">&times;</button>
             `;
-            container.appendChild(item);
-        });
-
-        // Show pending file previews
-        pendingImageFiles.forEach((file, idx) => {
-            const item = document.createElement('div');
-            item.className = 'image-preview-item';
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                item.innerHTML = `
-                    <img src="${e.target.result}" alt="${file.name}">
-                    <button type="button" class="image-preview-remove" data-type="pending" data-index="${idx}">&times;</button>
-                `;
-            };
-            reader.readAsDataURL(file);
+            const imgEl = item.querySelector('img');
+            if (it.kind === 'url') {
+                imgEl.src = it.value;
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => { imgEl.src = e.target.result; };
+                reader.readAsDataURL(it.value);
+                imgEl.alt = it.value.name || `Image ${idx + 1}`;
+            }
+            attachDragHandlers(item);
             container.appendChild(item);
         });
 
@@ -455,15 +521,42 @@ const AdminApp = (function () {
         container.onclick = (e) => {
             const btn = e.target.closest('.image-preview-remove');
             if (!btn) return;
-            const type = btn.dataset.type;
             const index = parseInt(btn.dataset.index);
-            if (type === 'existing') {
-                existingImageUrls.splice(index, 1);
-            } else {
-                pendingImageFiles.splice(index, 1);
-            }
+            imageItems.splice(index, 1);
             renderImagePreviews();
         };
+    }
+
+    function attachDragHandlers(el) {
+        el.addEventListener('dragstart', (e) => {
+            dragSrcIndex = parseInt(el.dataset.index);
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // Required for Firefox to start drag
+            try { e.dataTransfer.setData('text/plain', String(dragSrcIndex)); } catch (_) {}
+        });
+        el.addEventListener('dragend', () => {
+            el.classList.remove('dragging');
+            document.querySelectorAll('.image-preview-item.drag-over').forEach(n => n.classList.remove('drag-over'));
+            dragSrcIndex = null;
+        });
+        el.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            el.classList.add('drag-over');
+        });
+        el.addEventListener('dragleave', () => {
+            el.classList.remove('drag-over');
+        });
+        el.addEventListener('drop', (e) => {
+            e.preventDefault();
+            el.classList.remove('drag-over');
+            const targetIndex = parseInt(el.dataset.index);
+            if (dragSrcIndex === null || isNaN(targetIndex) || dragSrcIndex === targetIndex) return;
+            const [moved] = imageItems.splice(dragSrcIndex, 1);
+            imageItems.splice(targetIndex, 0, moved);
+            renderImagePreviews();
+        });
     }
 
     // Cloudinary configuration
@@ -503,6 +596,7 @@ const AdminApp = (function () {
             } catch (err) {
                 console.error('Cloudinary upload error:', err);
                 showNotification(`Failed to upload ${file.name}: ${err.message}`, 'error');
+                logActivity('upload_failed', file.name, `Error: ${err.message} | Saree: ${sareeCode}`);
                 // Don't fall back to base64 — it exceeds Firestore limits
             }
         }
@@ -549,6 +643,8 @@ const AdminApp = (function () {
         document.getElementById('productActive').checked = true;
         pendingImageFiles = [];
         existingImageUrls = [];
+        imageItems = [];
+        renderImagePreviews();
         updateDiscountDisplay();
 
         if (product) {
@@ -572,7 +668,8 @@ const AdminApp = (function () {
 
             // Handle images
             if (product.images && product.images.length > 0) {
-                existingImageUrls = [...product.images];
+                imageItems = product.images.map(url => ({ kind: 'url', value: url }));
+                renderImagePreviews();
             } else if (product.image) {
                 document.getElementById('productImage').value = product.image;
             }
@@ -620,6 +717,10 @@ const AdminApp = (function () {
         saveBtn.disabled = true;
 
         try {
+            // Sync derived arrays from the unified ordered list
+            pendingImageFiles = imageItems.filter(it => it.kind === 'file').map(it => it.value);
+            existingImageUrls = imageItems.filter(it => it.kind === 'url').map(it => it.value);
+
             // Upload any pending images
             let newImageUrls = [];
             if (pendingImageFiles.length > 0) {
@@ -640,8 +741,12 @@ const AdminApp = (function () {
                 showNotification(`${pendingImageFiles.length - newImageUrls.length} image(s) failed to upload. Product saved with ${newImageUrls.length} image(s).`, 'warning');
             }
 
-            // Combine existing + newly uploaded images
-            const allImages = [...existingImageUrls, ...newImageUrls];
+            // Weave uploaded URLs back into the user-defined order
+            let uploadIdx = 0;
+            const allImages = imageItems.map(it => {
+                if (it.kind === 'url') return it.value;
+                return newImageUrls[uploadIdx++] || null;
+            }).filter(Boolean);
 
             // Set images array and backwards-compatible image field
             if (allImages.length > 0) {
@@ -658,6 +763,7 @@ const AdminApp = (function () {
                         ...productData,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    logActivity('product_updated', productData.name, `Code: ${sareeCode} | Price: ${formatPrice(productData.price)} | Category: ${productData.category}`);
                     showNotification('Product updated successfully!', 'success');
                 } else {
                     await db.collection('products').add({
@@ -665,6 +771,7 @@ const AdminApp = (function () {
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    logActivity('product_added', productData.name, `Code: ${sareeCode} | Price: ${formatPrice(productData.price)} | Category: ${productData.category}`);
                     showNotification('Product added successfully!', 'success');
                 }
             } else {
@@ -728,9 +835,11 @@ const AdminApp = (function () {
                 if (db) {
                     await db.collection('products').doc(productId).delete();
                 }
+                logActivity('product_deleted', productName, `ID: ${productId}`);
                 allProducts = allProducts.filter(p => p.id !== productId);
                 renderProducts();
                 updateMetrics();
+                updateProductStats();
                 showNotification('Product deleted', 'success');
             } catch (error) {
                 console.error('Error deleting product:', error);
@@ -1197,11 +1306,13 @@ const AdminApp = (function () {
         try {
             if (id) {
                 await db.collection('coupons').doc(id).update(data);
+                logActivity('coupon_updated', code, `${discountType === 'percentage' ? discountValue + '%' : formatPrice(discountValue)} off`);
                 showNotification('Coupon updated successfully', 'success');
             } else {
                 data.currentUses = 0;
                 data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                 await db.collection('coupons').add(data);
+                logActivity('coupon_created', code, `${discountType === 'percentage' ? discountValue + '%' : formatPrice(discountValue)} off | Min: ${formatPrice(minOrderValue)}`);
                 showNotification('Coupon created successfully', 'success');
             }
 
@@ -1244,6 +1355,7 @@ const AdminApp = (function () {
             overlay.remove();
             try {
                 if (db) await db.collection('coupons').doc(couponId).delete();
+                logActivity('coupon_deleted', couponCode, `ID: ${couponId}`);
                 allCoupons = allCoupons.filter(c => c.id !== couponId);
                 renderCoupons();
                 showNotification('Coupon deleted', 'success');
@@ -1276,6 +1388,102 @@ const AdminApp = (function () {
 
         searchInput?.addEventListener('input', (e) => {
             renderCoupons(e.target.value);
+        });
+    }
+
+    // ============================================================
+    // ACTIVITY LOG
+    // ============================================================
+
+    let allActivities = [];
+
+    async function logActivity(action, itemName, details) {
+        if (!db) return;
+        try {
+            await db.collection('activityLog').add({
+                action: action,
+                itemName: itemName || '',
+                details: details || '',
+                user: currentUser?.email || 'Unknown',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (e) {
+            console.warn('Failed to log activity:', e);
+        }
+    }
+
+    async function loadActivity() {
+        try {
+            if (db) {
+                const snap = await db.collection('activityLog').orderBy('timestamp', 'desc').limit(200).get();
+                allActivities = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+        } catch (error) {
+            console.error('Error loading activity:', error);
+        }
+        renderActivity();
+        updateActivityStats();
+    }
+
+    function updateActivityStats() {
+        const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+        el('statTotalActions', allActivities.length);
+        el('statProductsAdded', allActivities.filter(a => a.action === 'product_added').length);
+        el('statProductsDeleted', allActivities.filter(a => a.action === 'product_deleted').length);
+        el('statCouponsCreated', allActivities.filter(a => a.action === 'coupon_created').length);
+    }
+
+    function renderActivity() {
+        const tbody = document.getElementById('activityTableBody');
+        if (!tbody) return;
+
+        let activities = allActivities;
+
+        const typeFilter = document.getElementById('activityTypeFilter')?.value;
+        if (typeFilter) {
+            activities = activities.filter(a => a.action === typeFilter);
+        }
+
+        if (activities.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="5"><div class="empty-state-small">No activity found.</div></td></tr>';
+            return;
+        }
+
+        const actionLabels = {
+            product_added: '<span style="color:#22c55e;">+ Added</span>',
+            product_updated: '<span style="color:#3b82f6;">&#9998; Updated</span>',
+            product_deleted: '<span style="color:#ef4444;">&#10005; Deleted</span>',
+            coupon_created: '<span style="color:#22c55e;">+ Created</span>',
+            coupon_updated: '<span style="color:#3b82f6;">&#9998; Updated</span>',
+            coupon_deleted: '<span style="color:#ef4444;">&#10005; Deleted</span>',
+            upload_failed: '<span style="color:#f59e0b;">&#9888; Upload Failed</span>'
+        };
+
+        const actionCategory = (a) => {
+            if (a.startsWith('product_')) return 'Product';
+            if (a.startsWith('coupon_')) return 'Coupon';
+            if (a === 'upload_failed') return 'Image Upload';
+            return 'Other';
+        };
+
+        tbody.innerHTML = activities.map(a => {
+            const ts = a.timestamp?.toDate?.() || new Date();
+            const dateStr = ts.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = ts.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            return `
+            <tr>
+                <td>${actionLabels[a.action] || a.action}</td>
+                <td><strong>${a.itemName || '—'}</strong><br><small style="color:var(--admin-text-muted);">${actionCategory(a.action)}</small></td>
+                <td style="font-size:0.8rem;color:var(--admin-text-muted);">${a.details || '—'}</td>
+                <td>${a.user || '—'}</td>
+                <td>${dateStr}<br><small style="color:var(--admin-text-muted);">${timeStr}</small></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function initActivityFilter() {
+        document.getElementById('activityTypeFilter')?.addEventListener('change', () => {
+            renderActivity();
         });
     }
 
@@ -1793,6 +2001,7 @@ const AdminApp = (function () {
         initProductModal();
         initCouponModal();
         initOrderFilters();
+        initActivityFilter();
         initSettings();
         initSidebar();
         initChartToggles();

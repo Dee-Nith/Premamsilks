@@ -811,6 +811,66 @@ body {
     color: var(--admin-text-muted);
 }
 
+/* Product Stats Bar */
+.product-stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.product-stat {
+    flex: 1;
+    min-width: 120px;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-sm);
+    padding: 16px 20px;
+    text-align: center;
+}
+
+.product-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--admin-accent);
+    font-family: var(--font-admin);
+}
+
+.product-stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+}
+
+/* Admin Filter Dropdowns */
+.admin-filter-select {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-sm);
+    padding: 10px 14px;
+    color: var(--admin-text);
+    font-size: 0.82rem;
+    font-family: var(--font-admin);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.admin-filter-select:focus {
+    outline: none;
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(13, 97, 87, 0.15);
+}
+
+.admin-filter-select option {
+    background: var(--admin-surface);
+    color: var(--admin-text);
+}
+
 .filter-select {
     background: var(--admin-surface);
     border: 1px solid var(--admin-border);
@@ -1217,6 +1277,23 @@ body {
     overflow: hidden;
     border: 2px solid var(--admin-border);
     transition: all 0.2s ease;
+    cursor: grab;
+    user-select: none;
+}
+
+.image-preview-item:active {
+    cursor: grabbing;
+}
+
+.image-preview-item.dragging {
+    opacity: 0.4;
+    transform: scale(0.95);
+}
+
+.image-preview-item.drag-over {
+    border-color: var(--admin-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
 .image-preview-item:first-child {
